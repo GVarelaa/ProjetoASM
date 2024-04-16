@@ -1,10 +1,10 @@
 from spade.agent import Agent
-from behaviours.price_behav import PriceBehaviour
+from behaviours.collect_behav import CollectBehaviour
 
-class PricerAgent(Agent):
+class CollectorAgent(Agent):
     cryptos = ["BTC", "ETH", "ONDO"]
 
     async def setup(self):
         print(f"{str(self.jid).partition('@')[0]} : starting...")
-        self.b = PriceBehaviour(period=4)
+        self.b = CollectBehaviour(period=60)
         self.add_behaviour(self.b)
