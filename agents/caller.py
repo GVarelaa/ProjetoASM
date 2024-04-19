@@ -2,7 +2,7 @@ from spade.agent import Agent
 from behaviours.caller_behav import CallerBehaviour
 
 class CallerAgent(Agent):
-    user = ""
+    user = "MacnBTC" #"randommeme65920"
     last_tweet = {}
 
     async def setup(self):

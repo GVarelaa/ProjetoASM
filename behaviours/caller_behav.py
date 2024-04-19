@@ -1,4 +1,6 @@
 import requests
+import re
+import pickle
 from datetime import datetime
 from spade.behaviour import PeriodicBehaviour
 from spade.message import Message
@@ -16,11 +18,27 @@ class CallerBehaviour(PeriodicBehaviour):
             data = response.json()
 
             date1 = datetime.strptime(data["date"], "%a, %d %b %Y %H:%M:%S GMT")
-            date2 = datetime.strptime(self.agent.last_tweet["date"], "%a, %d %b %Y %H:%M:%S GMT")
 
-            if date1 > date2:
-                # Fazer o processamento de linguagem com o $ e enviar a performative para comprar
-                msg = Message(to="manager@localhost") # Enviar ao manager?
-                msg.set_metadata("performative", "CALL")
+            if "date" in self.agent.last_tweet:
+                date2 = datetime.strptime(self.agent.last_tweet["date"], "%a, %d %b %Y %H:%M:%S GMT")
+            else:
+                date2 = None
+
+            if date2 is None or date1 > date2:
+                self.agent.last_tweet["tweet"] = data["text"]
+                self.agent.last_tweet["date"] = data["date"]
+
+                match = re.search(r'\$\w+\b', data["text"])
+
+                if match is not None:
+                    msg = Message(to="manager@localhost") # Enviar ao manager?
+                    msg.set_metadata("performative", "CALL")
+                    
+                    #serialized_data = pickle.dumps({"ticker": match.group(0)})
+                    msg.body = match.group(0)
+
+                    await self.send(msg)
+                else:
+                    print("Ticker not found")
         else:
             print('Request error:', response.status_code)

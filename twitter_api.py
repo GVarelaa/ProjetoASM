@@ -23,5 +23,11 @@ def get_tweets(user):
     tweet = {"text": text, "date": date}
     return jsonify(tweet)
 
+@app.route('/trends')
+def get_trends():
+    trends = scraper.trends()
+    return jsonify(trends)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

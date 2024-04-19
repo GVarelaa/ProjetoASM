@@ -1,46 +1,40 @@
 #from agents import trendScrapper
 from agents.collector import CollectorAgent
 from agents.mapper import MapperAgent
+from agents.caller import CallerAgent
+from agents.manager import ManagerAgent
 from spade import quit_spade
 import time
 
+XMPP_SERVER = 'localhost'
+PASSWORD = 'admin'
+
 if __name__ == "__main__":
-    """
-    trendScrapper = trendScrapper.TrendScrapperAgent("trendscrapper_agent@mi", "admin")
-    future = trendScrapper.start()
-    future.result()
+    caller = CallerAgent(f"caller@{XMPP_SERVER}", PASSWORD)
+    manager = ManagerAgent(f"manager@{XMPP_SERVER}", PASSWORD)
 
-    while trendScrapper.is_alive():
+    res_manager = manager.start(auto_register=True)
+    res_manager.result()
+
+    time.sleep(1)
+
+    res_caller = caller.start(auto_register=True)
+    res_caller.result()
+    
+    time.sleep(1)
+
+        # Handle interruption of all agents
+    while manager.is_alive():
         try:
             time.sleep(1)
         except KeyboardInterrupt:
-            trendScrapper.stop()
-            break
-    """
+            # stop all agents
+            caller.stop()
+            manager.stop()
 
-    mapper_agent = MapperAgent("mapper_agent@zenbookum5401qa", "admin")
-    future = mapper_agent.start()
-    future.result()
-
-    while mapper_agent.is_alive():
-        try:
-            time.sleep(1)
-        except KeyboardInterrupt:
-            mapper_agent.stop()
             break
-        
-    """
-    collector_agent = CollectorAgent("collector_agent@zenbookum5401qa", "admin")
-    future = collector_agent.start()
-    future.result()
 
-    while collector_agent.is_alive():
-        try:
-            time.sleep(1)
-        except KeyboardInterrupt:
-            collector_agent.stop()
-            break
-    """
+    print("Agents finished")
 
     quit_spade()
 
