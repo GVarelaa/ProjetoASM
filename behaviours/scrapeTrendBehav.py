@@ -1,7 +1,8 @@
 from spade.behaviour import PeriodicBehaviour
 from utils.trendsscrapper import TrendScraper
-#from spade.message import Message
+from spade.message import Message
 import random
+import jsonpickle
 
 class scrapeTrendBehaviour(PeriodicBehaviour):
     async def run(self):
@@ -9,13 +10,18 @@ class scrapeTrendBehaviour(PeriodicBehaviour):
         cryptos  = random.sample(self.agent.cryptos,3)
         scraper = TrendScraper()
         trending_topics = scraper.trends()
-        print("TTs: ", trending_topics)
         
         for item in cryptos:
             i = random.randint(0, len(trending_topics))
             trending_topics.insert(i, item)
-        print("Final List: ", trending_topics)
-
+        
+        msg = Message(to="manager@localhost") # Enviar ao manager?
+        msg.set_metadata("performative", "trends")
+        msg.body = jsonpickle.encode(trending_topics)
+        
+        print(f"{self.agent.jid}: Sending trending topics to manager - {trending_topics}")
+        
+        await self.send(msg)
 
         
         
