@@ -4,7 +4,7 @@ from spade.message import Message
 import random
 import jsonpickle
 
-class scrapeTrendBehaviour(PeriodicBehaviour):
+class ScrapeTrendBehaviour(PeriodicBehaviour):
     async def run(self):
         print("Trend's scraper behaviour running...")
         cryptos  = random.sample(self.agent.cryptos,3)

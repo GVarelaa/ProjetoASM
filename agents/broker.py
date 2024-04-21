@@ -1,9 +1,9 @@
 from spade.agent import Agent
-from behaviours.brokerBehav import brokerBehaviour
+from behaviours.broker_behav import BrokerBehaviour
 
 class brokerAgent(Agent):
     async def setup(self):
         print("Broker agent starting...")
 
-        brokerBehav = brokerBehaviour(period=1)
+        brokerBehav = BrokerBehaviour(period=1)
         self.add_behaviour(brokerBehav)

@@ -2,7 +2,7 @@ import jsonpickle
 from spade.behaviour import CyclicBehaviour
 from spade.message import Message
 
-class brokerBehaviour(CyclicBehaviour):
+class BrokerBehaviour(CyclicBehaviour):
     async def on_start(self):
         print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
 
