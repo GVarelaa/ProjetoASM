@@ -6,5 +6,5 @@ class TrendScrapperAgent(Agent):
     async def setup(self):
         print("Trend's scrapper agent starting...")
 
-        scraperBehav = ScrapeTrendBehaviour(period=1)
+        scraperBehav = ScrapeTrendBehaviour(period=10)
         self.add_behaviour(scraperBehav)
