@@ -1,52 +1,103 @@
-import tkinter as tk
-import customtkinter as ctk
+import ttkbootstrap as ttk
 
-class Influencers(ctk.CTkFrame):
-    def __init__(self, master=None, **kwargs):
-        super().__init__(master, **kwargs)
-        self.master = master
-        self.influencers = ["gui", "gabs"]
+class InfluencersPage:
+    def __init__(self):
+        self.root = ttk.Window(themename="vapor")
+        self.influencers = ["Influencer 1", "Influencer 2", "Influencer 3"]  # Initial list of influencers
+        self.root.title("Influencers")
+        self.root.geometry("600x500")
+
         self.create_widgets()
 
-
     def create_widgets(self):
-        self.display_area = ctk.CTkFrame(self)
-        self.display_area.pack(fill="both", expand=True, pady=20)
+        # Label for the page title
+        title_label = ttk.Label(self.root, text="Influencers", font=('Lato', 18), bootstyle="light")
+        title_label.pack(pady=10)
+        
+        # Frame for adding an influencer
+        add_frame = ttk.Frame(self.root)
+        add_frame.pack(fill='x', padx=10, pady=5)
 
-        self.label = ctk.CTkLabel(self, text="Add New Influencer")
-        self.label.pack(pady=(20, 10))
+        # Text box to enter the influencer name
+        self.influencer_entry = ttk.Entry(add_frame, width=50)
+        self.influencer_entry.pack(side='left', padx=(15, 5))  # Add padding to the right side of the entry widget
 
-        self.entry = ctk.CTkEntry(self)
-        self.entry.pack()
+        # Button to add the influencer
+        add_button = ttk.Button(add_frame, width=10,text="Add", command=self.add_influencer, bootstyle="light-outline")
+        add_button.pack(side='left', padx=(15, 0))  # Add padding to the left side of the button
 
-        self.add_button = ctk.CTkButton(self, text="Add", command=self.add_influencer)
-        self.add_button.pack(pady=10)
 
-        self.update_display()
+        # Frame to contain the list of influencers
+        self.influencers_frame = ttk.Frame(self.root, bootstyle="dark")
+        self.influencers_frame.pack(expand=True, fill='both', pady=10)
 
+        # List of influencers
+        self.influencer_widgets = []
+        for influencer in self.influencers:
+            influencer_frame = ttk.Frame(self.influencers_frame)
+            influencer_frame.pack(fill='x', padx=10, pady=5)
+
+            influencer_label = ttk.Label(influencer_frame, font=('Lato', 12, 'bold'),text=influencer, bootstyle="light")
+            influencer_label.pack(side='left')
+
+            remove_button = ttk.Button(influencer_frame, text="Remove", command=lambda i=influencer: self.remove_influencer(i), bootstyle="light-outline")
+            remove_button.pack(side='right')
+
+            self.influencer_widgets.append((influencer_frame, influencer_label, remove_button))
+
+        # Button to go back to the previous page
+        return_button = ttk.Button(self.root, text="Back", command=self.return_to_main, bootstyle="light-outline")
+        return_button.pack(pady=10)
+        
+        
 
     def add_influencer(self):
-        name = self.entry.get()
-        if name:
-            self.influencers.append(name)
-            self.update_display()
+        influencer_name = self.influencer_entry.get()  # Get the influencer name from the entry widget
+        if influencer_name:  # Check if the influencer name is not empty
+            self.influencers.append(influencer_name)  # Add the influencer to the list
+            self.update_widgets()  # Update the widgets to reflect the changes
+        else:
+            # You may want to display a message or handle empty input differently
+            print("Please enter a valid influencer name.")
+
+    def remove_influencer(self, influencer):
+        self.influencers.remove(influencer)
+        self.update_widgets()
+
+    def update_widgets(self):
+
+        # Clear the influencers frame
+        for widget_tuple in self.influencer_widgets:
+            widget_tuple[0].destroy()
+
+        # Recreate the widgets for each updated influencer
+        self.influencer_widgets.clear()
+        for influencer in self.influencers:
+            influencer_frame = ttk.Frame(self.influencers_frame)
+            influencer_frame.pack(fill='x', padx=10, pady=5)
+
+            influencer_label = ttk.Label(influencer_frame, font=('Lato', 12, 'bold'),text=influencer, bootstyle="light")
+            influencer_label.pack(side='left')
+
+            remove_button = ttk.Button(influencer_frame, text="Remove", command=lambda i=influencer: self.remove_influencer(i), style="primary.TButton")
+            remove_button.pack(side='right')
+
+            self.influencer_widgets.append((influencer_frame, influencer_label, remove_button))
+    
+    def return_to_main(self):
+        # Import MainPage class here to avoid circular import
+        from main import MainPage
+        
+        # Destroy current page
+        self.root.destroy()
+
+        # Create and display Main page
+        ttk.Style.instance = None
+        MainPage()
+        
 
 
-    def update_display(self):
-        # Clear the display area
-        for widget in self.display_area.winfo_children():
-            widget.destroy()
 
-        # Display each influencer with a remove button
-        for idx, name in enumerate(self.influencers):
-            frame = ctk.CTkFrame(self.display_area)
-            frame.pack(fill="x", pady=5)
-            label = ctk.CTkLabel(frame, text=name)
-            label.pack(side="left", padx=10)
-            remove_button = ctk.CTkButton(frame, text="Remove", command=lambda idx=idx: self.remove_influencer(idx))
-            remove_button.pack(side="right")
-
-
-    def remove_influencer(self, idx):
-        del self.influencers[idx]
-        self.update_display()
+if __name__ == "__main__":
+    app = InfluencersPage()
+    app.root.mainloop()

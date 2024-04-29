@@ -1,60 +1,53 @@
-# Importing Tkinter Library
-import tkinter as tk
-import customtkinter as ctk
-from navbar import NavBar
-from influencers import Influencers
+import ttkbootstrap as ttk
+from influencers import InfluencersPage
+from settings import SettingsPage
+from history import HistoryPage
 
-class MainApplication(ctk.CTk):
+class MainPage:
     def __init__(self):
-        super().__init__()
+        self.root = ttk.Window(themename="vapor")
+        self.root.title("Portfolio Manager")
+        self.root.geometry("600x500")
 
-        self.title("Portfolio Manager")
+        self.create_widgets()
+
+    def create_widgets(self):
         
-        # Setting up theme of your app
-        ctk.set_appearance_mode("dark")
+        # Logo
+        # Label para exibir o texto "Portfolio Manager"
+        label = ttk.Label(self.root, text="Portfolio Manager", font=('Lato', 42), bootstyle="light")
+        label.pack(pady=(130,0))
         
-        # Setting up theme of your components
-        ctk.set_default_color_theme("dark-blue")
+        # Influencer
+        influencers_button = ttk.Button(bootstyle="light-outline", text="Influencers", width=30,command=self.open_influencers_page)
+        influencers_button.pack(pady=(50,0))
         
-        # Creating Window of our App
-        root = ctk.CTk()
+        # History
+        history_button = ttk.Button(bootstyle="light-outline", text="History", width=30,command=self.open_history_page)
+        history_button.pack(pady=(15,0))
+        
+        # Settings
+        settings_button = ttk.Button(bootstyle="light-outline", text="Settings", width=30,command=self.open_settings_page)
+        settings_button.pack(pady=(15,0))
 
-        # Settings Window width and height
-        root.geometry('1280x720')
+    def open_influencers_page(self):
+        self.root.destroy()  # Close current window
+        ttk.Style.instance = None
+        InfluencersPage()
+        
 
-        # Initialize navbar with a reference to the page switching function
-        self.nav_bar = NavBar(self, page_switch_callback=self.switch_page)
-        self.nav_bar.pack(side="top", fill="x")
+    def open_history_page(self):
+        self.root.destroy()  # Close current window
+        ttk.Style.instance = None
+        HistoryPage()
 
-        # Dictionary to hold the different pages
-        self.pages = {}
-        self.create_pages()
+    def open_settings_page(self):
+        self.root.destroy()  # Close current window
+        ttk.Style.instance = None
+        SettingsPage()
+        
+        
 
-
-    def create_pages(self):
-        self.pages['home'] = ctk.CTkFrame(self, width=800, height=500)
-        home_label = ctk.CTkLabel(self.pages['home'], text="Home Page")
-        home_label.pack(pady=20)
-
-        self.pages['influencers'] = Influencers(self)
-
-        self.pages['history'] = ctk.CTkFrame(self, width=800, height=500)
-        history_label = ctk.CTkLabel(self.pages['history'], text="History Page")
-        history_label.pack(pady=20)
-
-        # Start with the Home page
-        self.pages['home'].pack(fill="both", expand=True)
-
-
-    def switch_page(self, page_name):
-        # Hide all pages
-        for page in self.pages.values():
-            page.pack_forget()
-
-        # Show the requested page
-        self.pages[page_name].pack(fill="both", expand=True)
-
-# Running the app
 if __name__ == "__main__":
-    app = MainApplication()
-    app.mainloop()
+    app = MainPage()
+    app.root.mainloop()
