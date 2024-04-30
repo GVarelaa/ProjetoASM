@@ -4,37 +4,15 @@ from ttkbootstrap.constants import *
 
 
 class PortfolioPage:   
-    def __init__(self):
+    def __init__(self, manager):
         self.root = ttk.Window(themename="vapor")
         self.root.title("Settings")
         self.root.geometry("800x600")
         self.current_page = 1
         self.rows_per_page = 10
-        
+        self.manager = manager
         #vou assumir que a wallet seja assim
-        self.wallet = {
-            "Bitcoin": (10.0, 5.0),
-            "Ethereum": (5, 3.0),
-            "Litecoin": (10, 2.0),
-            "Ripple": (10, 1.5),
-            "Bitcoin Cash": (15, 6.0),
-            "Cardano": (8, 1.2),
-            "Polkadot": (12, 4.5),
-            "Stellar": (20, 0.8),
-            "Chainlink": (6, 5.2),
-            "USD Coin": (100, 1.0),
-            "Binance Coin": (3, 20.0),
-            "Tether": (200, 1.0),
-            "Dogecoin": (50, 0.3),
-            "Wrapped Bitcoin": (7, 40000.0),
-            "Uniswap": (25, 30.0),
-            "Bitcoin SV": (4, 180.0),
-            "Aave": (2, 400.0),
-            "EOS": (30, 3.5),
-            "Monero": (3, 150.0),
-            "TRON": (500, 0.05),
-            "NEO": (12, 20.0)
-        }
+        self.wallet = self.manager.get_portfolio()
 
 
         self.create_widgets()
@@ -95,7 +73,7 @@ class PortfolioPage:
 
         # Create and display Main page
         ttk.Style.instance = None
-        MainPage()
+        MainPage(self.manager)
 
 if __name__ == "__main__":
     app = PortfolioPage()

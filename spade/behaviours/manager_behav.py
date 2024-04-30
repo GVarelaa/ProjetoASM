@@ -12,6 +12,7 @@ class ManagerBehaviour(CyclicBehaviour):
 
     async def run(self):
         print(f"{str(self.agent.jid).partition('@')[0]} : behaviour running...")
+        # print portfolio
         
         # enviar decisão ao broker - exemplo
         #request = brokerMessage("buy", "BTC", 10, 100)
@@ -29,9 +30,14 @@ class ManagerBehaviour(CyclicBehaviour):
             #    print("MANAGER")
             #    print(trends)
             
-           decoded_data = pickle.loads(msg.body)
+            # adiciona resposta do broker ao histórico
+            #if msg.get_metadata("performative") == "confirm":
+            #    message = jsonpickle.decode(msg.body)
+            #    self.agent.add_history(message.getMessage())
+            
+            decoded_data = pickle.loads(msg.body)
 #
-           if msg.get_metadata("performative") == "CALL":
+            if msg.get_metadata("performative") == "CALL":
                 print(f"{str(self.agent.jid).partition('@')[0]} : message received with content: " + str(msg.body))
 #
         #        # Se não estiver no portfólio então compra

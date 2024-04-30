@@ -1,9 +1,10 @@
 class brokerMessage():
-    def __init__(self, decision, crypto, value, quantity):
+    def __init__(self, decision, crypto, value, quantity, message):
         self.decision = decision
         self.crypto = crypto
         self.value = value
         self.quantity = quantity
+        self.message = message
     
     def getDecision(self):
         return self.decision
@@ -28,6 +29,12 @@ class brokerMessage():
     
     def setQuantity(self, quantity):
         self.quantity = quantity
+    
+    def getMessage(self):
+        return self.message
+    
+    def setMessage(self, message):
+        self.message = message
        
     def __str__(self):
         return f"Decision: {self.decision}, Crypto: {self.crypto}, Value: {self.value}, Quantity: {self.quantity}"

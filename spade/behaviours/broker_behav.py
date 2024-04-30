@@ -14,17 +14,21 @@ class BrokerBehaviour(CyclicBehaviour):
         if msg:
            performative = msg.get_metadata("performative")
            msg_to_manager = Message(to=str(msg.sender)) 
-           msg_to_manager.body =  msg.body
 
            if performative == "request":
                request = jsonpickle.decode(msg.body)
                decision = request.getDecision()
                if decision == "buy":
-                    print(f"{str(self.agent.jid).partition('@')[0]} : buying {request.getQuantity()} of {request.getCrypto()} at {request.getValue()}")
+                   message = f"{str(self.agent.jid).partition('@')[0]} : buying {request.getQuantity()} of {request.getCrypto()} at {request.getValue()}"
+                   print(message)
+                   request.setMessage(message)
                     
                else:
-                   print(f"{str(self.agent.jid).partition('@')[0]} : selling {request.getQuantity()} of {request.getCrypto()} at {request.getValue()}")
-               
+                   message = f"{str(self.agent.jid).partition('@')[0]} : selling {request.getQuantity()} of {request.getCrypto()} at {request.getValue()}"
+                   print(message)
+                   request.setMessage(message)
+                   
+               msg_to_manager.body = jsonpickle.encode(request)
                msg_to_manager.set_metadata("performative", "confirm") 
                
            else:
