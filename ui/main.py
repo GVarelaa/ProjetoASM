@@ -2,6 +2,7 @@ import ttkbootstrap as ttk
 from influencers import InfluencersPage
 from settings import SettingsPage
 from history import HistoryPage
+from portfolio import PortfolioPage
 
 class MainPage:
     def __init__(self):
@@ -29,6 +30,10 @@ class MainPage:
         # Settings
         settings_button = ttk.Button(bootstyle="light-outline", text="Settings", width=30,command=self.open_settings_page)
         settings_button.pack(pady=(15,0))
+        
+        # Portfolio
+        portfolio_button = ttk.Button(bootstyle="light-outline", text="Portfolio", width=30,command=self.open_portfolio_page)
+        portfolio_button.pack(pady=(15,0))
 
     def open_influencers_page(self):
         self.root.destroy()  # Close current window
@@ -45,7 +50,11 @@ class MainPage:
         self.root.destroy()  # Close current window
         ttk.Style.instance = None
         SettingsPage()
-        
+    
+    def open_portfolio_page(self):
+        self.root.destroy()
+        ttk.Style.instance = None
+        PortfolioPage()
         
 
 if __name__ == "__main__":

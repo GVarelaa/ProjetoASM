@@ -1,4 +1,5 @@
 import ttkbootstrap as ttk
+from ttkbootstrap.toast import ToastNotification
 
 class SettingsPage:
     def __init__(self):
@@ -12,7 +13,7 @@ class SettingsPage:
 
     def create_widgets(self):
         
-         # Label for the page title
+        # Label for the page title
         title_label = ttk.Label(self.root, text="Settings", font=('Lato', 30), bootstyle="light")
         title_label.pack(pady=10)
         
@@ -59,11 +60,29 @@ class SettingsPage:
         # Process the threshold value as needed (e.g., save to file, update configuration)
         self.threshold_value = threshold_value
         self.current_threshold_label.config(text=f"Threshold: {self.threshold_value}")
+          
+        toast = ToastNotification(
+            title="Settings",
+            message="Threshold value successfully saved!",
+            duration=3000,
+            bootstyle="dark",
+            position=(70,30,"ne")
+        )
+        toast.show_toast()
+
     
     def save_loss(self):
         loss_value = self.loss_entry.get()
         self.loss_value = loss_value
         self.current_loss_label.config(text=f"Loss: {self.loss_value}")
+        
+        toast = ToastNotification(
+            title="Settings",
+            message="Loss value successfully saved!",
+            duration=3000,
+            bootstyle="dark",
+        )
+        toast.show_toast()
     
     def return_to_main(self):
         # Import MainPage class here to avoid circular import
