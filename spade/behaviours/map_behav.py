@@ -16,15 +16,16 @@ class MapBehaviour(CyclicBehaviour):
         if msg:
             print(f"{self.agent.jid} : Message received: {msg.body}")
 
-            ticker = jsonpickle.decode(msg.body)
+            data = jsonpickle.decode(msg.body)
             
-            coin_id = get_coin_id(ticker)
-            
-            reply = Message(to=msg.sender)
-            reply.set_metadata("performative", "MAPREPLY")
-            reply.body = jsonpickle(coin_id)
+            if msg.get_metadata("performative") == "MAP":
+                coin_id = get_coin_id(data["ticker"])
+                
+                reply = Message(to=msg.sender)
+                reply.set_metadata("performative", "MAPREPLY")
+                reply.body = jsonpickle({"coin_id": coin_id}) # Meter o nome também para dar display na interface
 
-            await self.send(reply)
+                await self.send(reply)
             
         else:
             print(f"{self.agent.jid} did not received any message after 10 seconds")
