@@ -1,6 +1,6 @@
 import requests
 import re
-import pickle
+import jsonpickle
 from datetime import datetime
 from spade.behaviour import PeriodicBehaviour
 from spade.message import Message
@@ -31,11 +31,10 @@ class CallerBehaviour(PeriodicBehaviour):
                 match = re.search(r'\$\w+\b', data["text"])
 
                 if match is not None:
-                    msg = Message(to="manager@localhost") # Enviar ao manager?
+                    msg = Message(to="manager@localhost")
                     msg.set_metadata("performative", "CALL")
                     
-                    #serialized_data = pickle.dumps({"ticker": match.group(0)})
-                    msg.body = match.group(0)
+                    msg.body = jsonpickle.encode({"ticker": match.group(0)})
 
                     await self.send(msg)
                 else:

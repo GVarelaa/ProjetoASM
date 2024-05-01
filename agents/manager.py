@@ -2,6 +2,7 @@ from spade.agent import Agent
 from behaviours.manager_behav import ManagerBehaviour
 
 class ManagerAgent(Agent):
+    # Tuplo -> Preço, Quantiadade de Tokens
     
     portfolio = {
             "Bitcoin": (10.0, 5.0),

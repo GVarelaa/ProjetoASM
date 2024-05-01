@@ -1,4 +1,3 @@
-import pickle
 from datetime import datetime
 import jsonpickle
 from spade.behaviour import CyclicBehaviour
@@ -22,7 +21,7 @@ class ManagerBehaviour(CyclicBehaviour):
         #await self.send(msg)
         
         msg = await self.receive(timeout=10)
-#
+
         if msg:
             # receber trends do twitter
             #if msg.get_metadata("performative") == "trends":
@@ -35,12 +34,25 @@ class ManagerBehaviour(CyclicBehaviour):
             #    message = jsonpickle.decode(msg.body)
             #    self.agent.add_history(message.getMessage())
             
-            decoded_data = pickle.loads(msg.body)
-#
+            data = jsonpickle.decode(msg.body)
+            
+            print(f"{str(self.agent.jid).partition('@')[0]} : message received with content: " + str(data))
+
             if msg.get_metadata("performative") == "CALL":
-                print(f"{str(self.agent.jid).partition('@')[0]} : message received with content: " + str(msg.body))
-#
-        #        # Se não estiver no portfólio então compra
-#
+                msg = Message(to="mapper@localhost")
+                msg.set_metadata("performative", "MAP")
+                msg.body = jsonpickle.encode(data)
+
+                await self.send(msg)
+                
+            elif msg.get_metadata("performative") == "MAPREPLY":
+                # Se não estiver no portfólio então compra
+                coin_id = data["coin_id"]
+
+                if coin_id not in self.agent.portfolio:
+                    self.agent.portfolio["coin_id"] = (0, 0)
+
+                    # Dar trigger a um agente collector e enviar mensagem ao broker pra comprar
+
         else:
             print(f"{str(self.agent.jid).partition('@')[0]} : message timeout after 10 seconds")
