@@ -1,6 +1,5 @@
 import requests
 
-
 def get_cryptos_by_ticker(ticker):
     url = "https://api.coingecko.com/api/v3/coins/list"
     response = requests.get(url)
@@ -49,4 +48,5 @@ def get_market_data(coin_id):
         data = response.json()
         return data[0] if data else "No data available for this cryptocurrency."
     else:
+        print(response.content)
         return "Failed to retrieve data, status code: {}".format(response.status_code)
