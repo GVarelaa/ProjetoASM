@@ -4,14 +4,14 @@ from utils.crypto_info import CryptoInfo
 import random
 
 class CollectBehaviour(PeriodicBehaviour):
+    async def on_start(self):
+        print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
+
     async def run(self):
         print(f"{str(self.agent.jid).partition('@')[0]} : behaviour running...")
 
-        tickers  = random.sample(self.agent.cryptos,3)
+        tickers  = random.sample(self.agent.cryptos, 3)
 
         for ticker in tickers:
-            print(ticker)
             info = CryptoInfo(ticker)
-            print(info.coin_id)
             market_data = info.get_market_data()
-            print(str(market_data) + "\n")
