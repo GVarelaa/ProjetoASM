@@ -12,12 +12,8 @@ from spade import quit_spade
 import time
 
 
-
 XMPP_SERVER = 'localhost'
 PASSWORD = 'admin'
-
-
-
 
 class MainPage:
     def __init__(self, manager: ManagerAgent):

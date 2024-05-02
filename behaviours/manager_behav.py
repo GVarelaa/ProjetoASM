@@ -1,9 +1,13 @@
-from datetime import datetime
 import jsonpickle
 from spade.behaviour import CyclicBehaviour
 from spade.message import Message
+from agents.collector import CollectorAgent
 
 from utils.brokerMessage import brokerMessage
+
+
+XMPP_SERVER = 'localhost'
+PASSWORD = 'admin'
 
 class ManagerBehaviour(CyclicBehaviour):
     async def on_start(self):
@@ -11,29 +15,10 @@ class ManagerBehaviour(CyclicBehaviour):
 
     async def run(self):
         print(f"{str(self.agent.jid).partition('@')[0]} : behaviour running...")
-        # print portfolio
-        
-        # enviar decisão ao broker - exemplo
-        #request = brokerMessage("buy", "BTC", 10, 100)
-        #msg = Message(to="broker@localhost")
-        #msg.set_metadata("performative", "request")
-        #msg.body = jsonpickle.encode(request)
-        #await self.send(msg)
         
         msg = await self.receive(timeout=10)
 
         if msg:
-            # receber trends do twitter
-            #if msg.get_metadata("performative") == "trends":
-            #    trends = jsonpickle.decode(msg.body)
-            #    print("MANAGER")
-            #    print(trends)
-            
-            # adiciona resposta do broker ao histórico
-            #if msg.get_metadata("performative") == "confirm":
-            #    message = jsonpickle.decode(msg.body)
-            #    self.agent.add_history(message.getMessage())
-            
             data = jsonpickle.decode(msg.body)
             
             print(f"{str(self.agent.jid).partition('@')[0]} : message received with content: " + str(data))
@@ -47,12 +32,32 @@ class ManagerBehaviour(CyclicBehaviour):
                 
             elif msg.get_metadata("performative") == "MAPREPLY":
                 # Se não estiver no portfólio então compra
-                coin_id = data["coin_id"]
+                coinid = data["coinid"]
 
-                if coin_id not in self.agent.portfolio:
-                    self.agent.portfolio["coin_id"] = (0, 0)
+                if coinid not in self.agent.portfolio:
+                    self.agent.portfolio["coinid"] = (0, 0)
 
                     # Dar trigger a um agente collector e enviar mensagem ao broker pra comprar
+                    collector = CollectorAgent(XMPP_SERVER, PASSWORD)
+                    collector.crypto = coinid
+                    collector.start(auto_register=True)
+
+                    msg = Message(to="broker@localhost")
+                    msg.set_metadata("performative", "BUY")
+                    msg.body = jsonpickle.encode({"coinid": coinid, "balance": 100}) # MUDAR O BALANCE QUE QUER COMPRAR
+            
+            elif msg.get_metadata("performative") == "INFO":
+                coinid = data["id"]
+                price = data["quote"]["USD"]["price"]
+                # volume = data["volume"]
+
+                # Atualizar o preço
+                self.agent.portfolio["id"] = (price, self.agent.portfolio["id"][1])
+
+            elif msg.get_metadata("performative", "BUYREPLY"):
+                # RECEBE A QUANTIDADE DE TOKENS QUE COMPROU E A QUE PREÇO
+
+
 
         else:
             print(f"{str(self.agent.jid).partition('@')[0]} : message timeout after 10 seconds")

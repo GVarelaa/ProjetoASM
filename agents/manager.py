@@ -4,6 +4,7 @@ from behaviours.manager_behav import ManagerBehaviour
 class ManagerAgent(Agent):
     # Tuplo -> Preço, Quantiadade de Tokens
     
+    balance = None
     portfolio = {
             "Bitcoin": (10.0, 5.0),
             "Ethereum": (5, 3.0),

@@ -7,7 +7,7 @@ def get_cryptos_by_ticker(ticker):
     url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
 
     parameters = {
-        'symbol': "btc".upper()
+        'symbol': ticker.upper()
     }
 
     headers = {
@@ -31,6 +31,8 @@ def get_coin_id(ticker):
     coin_id = 0
 
     matching_coins = get_cryptos_by_ticker(ticker)
+
+    print(matching_coins)
 
     if len(matching_coins) == 0:
         return "No matching coin found"
@@ -86,3 +88,4 @@ def get_market_data(coin_id):
     else:
         return "Failed to retrieve data, status code: {}".format(response.status_code)
 
+print(get_market_data("5426"))
