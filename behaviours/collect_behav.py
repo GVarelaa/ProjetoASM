@@ -9,8 +9,6 @@ class CollectBehaviour(PeriodicBehaviour):
         print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
 
     async def run(self):
-        print(f"{str(self.agent.jid).partition('@')[0]} : behaviour running...")
-
         msg = Message(to="manager@localhost")
         msg.set_metadata("performative", "INFO")
 

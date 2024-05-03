@@ -1,5 +1,6 @@
-from config import API_KEY
 import requests
+
+API_KEY = '93dd4d1d-f5af-4c2f-9787-d7356d23dbc9'
 
 def get_cryptos_by_ticker(ticker):
     matching_coins = []
@@ -57,7 +58,7 @@ def get_coinid(ticker):
             volumes = {matching_id: data['data'][str(matching_id)]['quote']['USD']['volume_24h'] for matching_id in matching_coins}
             coinid = max(volumes, key=volumes.get)
         
-    return coinid
+    return coinid, data['data'][str(coinid)]['name']
 
 
 def get_market_data(coinid):
@@ -87,6 +88,3 @@ def get_market_data(coinid):
     
     else:
         return "Failed to retrieve data, status code: {}".format(response.status_code)
-
-
-print(get_market_data("1"))

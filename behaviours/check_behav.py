@@ -8,10 +8,11 @@ class CheckBehaviour(PeriodicBehaviour):
         print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
 
     async def run(self):
-        print(f"{str(self.agent.jid).partition('@')[0]} : behaviour running...")
+        print(f"Portfolio : {self.agent.portfolio}")
 
         for coinid in self.agent.portfolio:
-            coin = self.agent.portfolio["coinid"]
+            coin = self.agent.portfolio[coinid]
+            print(coin)
 
             if coin.profit >= self.agent.takeprofit:
                 # Vender 

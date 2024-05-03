@@ -2,8 +2,9 @@ from spade.agent import Agent
 from behaviours.caller_behav import CallerBehaviour
 
 class CallerAgent(Agent):
-    user = "MacnBTC" #"randommeme65920"
+    user = "randommeme65920" #"randommeme65920"
     last_tweet = {}
+    first_time = True
 
     async def setup(self):
         print(f"{str(self.jid).partition('@')[0]} : starting...")

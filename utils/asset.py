@@ -1,7 +1,7 @@
 class Asset:
-    def __init__(self, coinid):
+    def __init__(self, coinid, name):
         self.coinid = coinid
-        self.name = None
+        self.name = name
         self.quantity = None
         self.initial_price = None
         self.current_price = None
@@ -18,5 +18,11 @@ class Asset:
         self.current_price = new_price
         self.value = self.quantity * new_price
         self.profit = (new_price - self.initial_price) * self.quantity
+        
+    def __str__(self):
+        return f"Asset({self.coinid}, {self.name}, Quantity: {self.quantity}, Initial Price: {self.initial_price}, Current Price: {self.current_price}, Value: {self.value}, Profit: {self.profit})"
+
+    def __repr__(self):
+        return f"Asset(coinid={self.coinid}, name={self.name}, quantity={self.quantity}, initial_price={self.initial_price}, current_price={self.current_price}, value={self.value}, profit={self.profit})"
 
 

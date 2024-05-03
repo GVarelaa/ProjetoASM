@@ -13,15 +13,21 @@ def get_tweets(user):
     tweets = scraper.tweets([userid], limit=1)
     
     entries = None
+
     for timeline in tweets[0]["data"]["user"]["result"]["timeline_v2"]["timeline"]["instructions"]:
         if timeline["type"] == "TimelineAddEntries":
             entries = timeline
 
-    text = entries["entries"][0]["content"]["itemContent"]["tweet_results"]["result"]["legacy"]["full_text"]
-    date = datetime.strptime(entries["entries"][0]["content"]["itemContent"]["tweet_results"]["result"]["legacy"]["created_at"], '%a %b %d %H:%M:%S %z %Y')
+    if entries is not None and "itemContent" in entries["entries"][0]["content"]:
+        text = entries["entries"][0]["content"]["itemContent"]["tweet_results"]["result"]["legacy"]["full_text"]
+        date = datetime.strptime(entries["entries"][0]["content"]["itemContent"]["tweet_results"]["result"]["legacy"]["created_at"], '%a %b %d %H:%M:%S %z %Y')
+        formatted_date = date.strftime('%d/%m/%Y %H:%M:%S')
 
-    tweet = {"text": text, "date": date}
-    return jsonify(tweet)
+        tweet = {"text": text, "date": formatted_date}
+        return jsonify(tweet)
+    
+    else:
+        return jsonify({"error": "Tweet não encontrado"}), 400
 
 @app.route('/trends')
 def get_trends():

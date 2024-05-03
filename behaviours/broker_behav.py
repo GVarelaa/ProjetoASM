@@ -10,12 +10,15 @@ class BrokerBehaviour(CyclicBehaviour):
         print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
 
     async def run(self):
-        print(f"{str(self.agent.jid).partition('@')[0]} : behaviour running...")
-
         msg = await self.receive(timeout=10)
 
         if msg:
             data = jsonpickle.decode(msg.body)
+            
+            performative = msg.get_metadata("performative")
+
+            print(f"{str(self.agent.jid).partition('@')[0]} : {performative}")
+            print(f"{str(self.agent.jid).partition('@')[0]} : message received with content: " + str(data))
 
             if msg.get_metadata("performative") == "BUY":
                 # NA REALIDADE TERÍAMOS DE USAR A API DE UMA CEX/DEX E COMPRAR -> VAMOS USAR UMA SIMULAÇÃO
@@ -27,7 +30,7 @@ class BrokerBehaviour(CyclicBehaviour):
                 data.price = price
                 data.quantity = quantity
 
-                msg = Message(to=msg.sender) 
+                msg = Message(to=str(msg.sender)) 
                 msg.set_metadata("performative", "BUYREPLY") 
                 msg.body = jsonpickle.encode(data)
                 

@@ -15,14 +15,15 @@ class ManagerBehaviour(CyclicBehaviour):
     async def on_start(self):
         print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
 
-    async def run(self):
-        print(f"{str(self.agent.jid).partition('@')[0]} : behaviour running...")
-        
+    async def run(self):        
         msg = await self.receive(timeout=10)
 
         if msg:
             data = jsonpickle.decode(msg.body)
             
+            performative = msg.get_metadata("performative")
+
+            print(f"{str(self.agent.jid).partition('@')[0]} : {performative}")
             print(f"{str(self.agent.jid).partition('@')[0]} : message received with content: " + str(data))
 
             if msg.get_metadata("performative") == "CALL":
@@ -35,22 +36,25 @@ class ManagerBehaviour(CyclicBehaviour):
             elif msg.get_metadata("performative") == "INFO":
                 coinid = data.coinid
                 price = data.price
-                volume = data.volume
+                volume = data.volume24h
 
                 # Atualizar o preço
-                self.agent.portfolio[coinid].update(price)
+                if self.agent.portfolio[coinid].quantity is not None:
+                    self.agent.portfolio[coinid].update(price)
 
             elif msg.get_metadata("performative") == "MAPREPLY":
                 # Se não estiver no portfólio então compra
                 coinid = data.coinid
+                name = data.name
 
-                if coinid not in self.agent.portfolio:
-                    self.agent.portfolio[coinid] = Asset(coinid)
+                if coinid not in self.agent.portfolio and coinid != "No matching coin found":
+                    self.agent.portfolio[coinid] = Asset(coinid, name)
 
                     # Dar trigger a um agente collector e enviar mensagem ao broker pra comprar
-                    collector = CollectorAgent(XMPP_SERVER, PASSWORD)
+                    collector = CollectorAgent(f"collector@{XMPP_SERVER}", PASSWORD)
                     collector.crypto = coinid
-                    collector.start(auto_register=True)
+
+                    await collector.start(auto_register=True)
 
                     msg = Message(to="broker@localhost")
                     msg.set_metadata("performative", "BUY")
@@ -58,13 +62,15 @@ class ManagerBehaviour(CyclicBehaviour):
                     trade = Trade(coinid, balance=100) # Balance deve vir da interface
                     msg.body = jsonpickle.encode(trade)
 
-            elif msg.get_metadata("performative", "BUYREPLY"):
+                    await self.send(msg)
+
+            elif msg.get_metadata("performative") == "BUYREPLY":
                 # RECEBE A QUANTIDADE DE TOKENS QUE COMPROU E A QUE PREÇO
                 coinid = data.coinid
 
                 self.agent.portfolio[coinid].set_info(data.price, data.quantity)
 
-            elif msg.get_metadata("performative", "SELLREPLY"):
+            elif msg.get_metadata("performative") == "SELLREPLY":
                 coinid = data.coinid
                 self.agent.balance += data.balance
 

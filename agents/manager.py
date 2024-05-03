@@ -4,9 +4,12 @@ from behaviours.check_behav import CheckBehaviour
 
 class ManagerAgent(Agent):
     # Tuplo -> Preço, Quantiadade de Tokens
-    stoploss = 20 # percentagem stoploss -> definir pela interface
-    takeprofit = 40 # percentagem takeprofit -> definir pela interface
+    stoploss = 10 # percentagem stoploss -> definir pela interface
+    takeprofit = 5 # percentagem takeprofit -> definir pela interface
     balance = None
+    portfolio = {}
+
+    """
     portfolio = {
             "Bitcoin": (10.0, 5.0),
             "Ethereum": (5, 3.0),
@@ -30,6 +33,8 @@ class ManagerAgent(Agent):
             "TRON": (500, 0.05),
             "NEO": (12, 20.0)
         }
+    """
+
     influencers = ["Influencer 1", "Influencer 2", "Influencer 3"] 
     history = ["JohnDoe : selling 7 of Ethereum at 13974.87",
     "JohnDoe : buying 3 of Litecoin at 23150.47",
@@ -79,7 +84,7 @@ class ManagerAgent(Agent):
         print(f"{str(self.jid).partition('@')[0]} : starting...")
 
         self.a = ManagerBehaviour()
-        self.b = CheckBehaviour(period=10) # 10 segundos
+        self.b = CheckBehaviour(period=30) # 10 segundos
 
         self.add_behaviour(self.a)
         self.add_behaviour(self.b)

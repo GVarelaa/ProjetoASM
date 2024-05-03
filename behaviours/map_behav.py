@@ -9,8 +9,6 @@ class MapBehaviour(CyclicBehaviour):
         print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
 
     async def run(self):
-        print(f"{str(self.agent.jid).partition('@')[0]} : behaviour running...")
-
         msg = await self.receive(timeout=10)
         
         if msg:
@@ -19,12 +17,14 @@ class MapBehaviour(CyclicBehaviour):
             data = jsonpickle.decode(msg.body)
             
             if msg.get_metadata("performative") == "MAP":
-                coinid = get_coinid(data.ticker)
-                data.coinid = coinid
+                coinid, name = get_coinid(data.ticker)
 
-                reply = Message(to=msg.sender)
+                data.coinid = coinid
+                data.name = name
+
+                reply = Message(to=str(msg.sender))
                 reply.set_metadata("performative", "MAPREPLY")
-                reply.body = jsonpickle(data)
+                reply.body = jsonpickle.encode(data)
 
                 await self.send(reply)
         else:
