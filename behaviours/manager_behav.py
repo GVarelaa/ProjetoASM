@@ -33,9 +33,9 @@ class ManagerBehaviour(CyclicBehaviour):
                 await self.send(msg)
             
             elif msg.get_metadata("performative") == "INFO":
-                coinid = data["coinid"]
-                price = data["quote"]["USD"]["price"]
-                # volume = data["volume"]
+                coinid = data.coinid
+                price = data.price
+                volume = data.volume
 
                 # Atualizar o preço
                 self.agent.portfolio[coinid].update(price)
@@ -55,7 +55,7 @@ class ManagerBehaviour(CyclicBehaviour):
                     msg = Message(to="broker@localhost")
                     msg.set_metadata("performative", "BUY")
 
-                    trade = Trade(coinid, 100) # Balance deve vir da interface
+                    trade = Trade(coinid, balance=100) # Balance deve vir da interface
                     msg.body = jsonpickle.encode(trade)
 
             elif msg.get_metadata("performative", "BUYREPLY"):

@@ -1,5 +1,6 @@
 from spade.behaviour import PeriodicBehaviour
 from utils.crypto_info import get_market_data
+from utils.data import Data
 from spade.message import Message
 import jsonpickle
 
@@ -14,6 +15,13 @@ class CollectBehaviour(PeriodicBehaviour):
         msg.set_metadata("performative", "INFO")
 
         data = get_market_data(self.agent.crypto)
-        msg.body = jsonpickle.encode(data)
+
+        coinid = data["id"]
+        name = data["name"]
+        price = data["quote"]["USD"]["price"]
+        volume = data["quote"]["USD"]["volume_24h"]
+        marketcap = data["quote"]["USD"]["market_cap"]
+
+        msg.body = jsonpickle.encode(Data(coinid, name, price, volume, marketcap))
 
         await self.send(msg)

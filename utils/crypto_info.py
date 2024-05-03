@@ -88,3 +88,5 @@ def get_market_data(coinid):
     else:
         return "Failed to retrieve data, status code: {}".format(response.status_code)
 
+
+print(get_market_data("1"))

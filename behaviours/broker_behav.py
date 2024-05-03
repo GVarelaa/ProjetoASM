@@ -32,6 +32,23 @@ class BrokerBehaviour(CyclicBehaviour):
                 msg.body = jsonpickle.encode(data)
                 
                 await self.send(msg)
+            
+            elif msg.get_metadata("performative") == "SELL":
+                # NOVAMENTE UMA SIMULAÇÃO
+                coin_data = get_market_data(data.coinid)
+
+                price = coin_data["quote"]["USD"]["price"]
+                balance = data.quantity * price
+
+                data.price = price
+                data.balance = balance
+
+                msg = Message(to=msg.sender) 
+                msg.set_metadata("performative", "SELLREPLY") 
+                msg.body = jsonpickle.encode(data)
+                
+                await self.send(msg)
+
             #else:
                     #msg_to_manager.set_metadata("performative", "refuse") 
 
