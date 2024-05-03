@@ -1,9 +1,11 @@
 from spade.agent import Agent
 from behaviours.manager_behav import ManagerBehaviour
+from behaviours.check_behav import CheckBehaviour
 
 class ManagerAgent(Agent):
     # Tuplo -> Preço, Quantiadade de Tokens
-    
+    stoploss = 20 # percentagem stoploss -> definir pela interface
+    takeprofit = 40 # percentagem takeprofit -> definir pela interface
     balance = None
     portfolio = {
             "Bitcoin": (10.0, 5.0),
@@ -76,7 +78,10 @@ class ManagerAgent(Agent):
     async def setup(self):
         print(f"{str(self.jid).partition('@')[0]} : starting...")
 
-        self.b = ManagerBehaviour()
+        self.a = ManagerBehaviour()
+        self.b = CheckBehaviour(period=10) # 10 segundos
+
+        self.add_behaviour(self.a)
         self.add_behaviour(self.b)
     
     def get_portfolio(self):

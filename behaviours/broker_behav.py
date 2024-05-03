@@ -2,6 +2,9 @@ import jsonpickle
 from spade.behaviour import CyclicBehaviour
 from spade.message import Message
 
+from utils.trade import Trade
+from utils.crypto_info import get_market_data
+
 class BrokerBehaviour(CyclicBehaviour):
     async def on_start(self):
         print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
@@ -12,30 +15,25 @@ class BrokerBehaviour(CyclicBehaviour):
         msg = await self.receive(timeout=10)
 
         if msg:
-           performative = msg.get_metadata("performative")
-           msg_to_manager = Message(to=str(msg.sender)) 
+            data = jsonpickle.decode(msg.body)
 
-           if performative == "request":
-               request = jsonpickle.decode(msg.body)
-               decision = request.getDecision()
-               if decision == "buy":
-                   message = f"{str(self.agent.jid).partition('@')[0]} : buying {request.getQuantity()} of {request.getCrypto()} at {request.getValue()}"
-                   print(message)
-                   request.setMessage(message)
+            if msg.get_metadata("performative") == "BUY":
+                # NA REALIDADE TERÍAMOS DE USAR A API DE UMA CEX/DEX E COMPRAR -> VAMOS USAR UMA SIMULAÇÃO
+                coin_data = get_market_data(data.coinid)
+
+                price = coin_data["quote"]["USD"]["price"]
+                quantity = data.balance / price
                     
-               else:
-                   message = f"{str(self.agent.jid).partition('@')[0]} : selling {request.getQuantity()} of {request.getCrypto()} at {request.getValue()}"
-                   print(message)
-                   request.setMessage(message)
-                   
-               msg_to_manager.body = jsonpickle.encode(request)
-               msg_to_manager.set_metadata("performative", "confirm") 
-               
-           else:
-                msg_to_manager.set_metadata("performative", "refuse") 
-                
-           await self.send(msg_to_manager)
-                
+                data.price = price
+                data.quantity = quantity
 
-        else:
-            print(f"{str(self.agent.jid).partition('@')[0]} : message timeout after 10 seconds")
+                msg = Message(to=msg.sender) 
+                msg.set_metadata("performative", "BUYREPLY") 
+                msg.body = jsonpickle.encode(data)
+                
+                await self.send(msg)
+            #else:
+                    #msg_to_manager.set_metadata("performative", "refuse") 
+
+            else:
+                print(f"{str(self.agent.jid).partition('@')[0]} : message timeout after 10 seconds")

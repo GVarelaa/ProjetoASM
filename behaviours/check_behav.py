@@ -1,0 +1,25 @@
+import jsonpickle
+from spade.behaviour import PeriodicBehaviour
+from spade.message import Message
+
+class CheckBehaviour(PeriodicBehaviour):
+    async def on_start(self):
+        print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
+
+    async def run(self):
+        print(f"{str(self.agent.jid).partition('@')[0]} : behaviour running...")
+
+        for coinid in self.agent.portfolio:
+            coin = self.agent.portfolio["coinid"]
+
+            if coin.profit >= self.agent.takeprofit:
+                # Vender 
+                msg = Message(to="broker@localhost")
+                msg.set_metadata("performative", "SELL")
+                msg.body = jsonpickle.encode({"coinid": coinid, "quantity": coin.quantity})
+
+            elif coin.profit <= self.agent.stoploss:
+                # Vender
+                msg = Message(to="broker@localhost")
+                msg.set_metadata("performative", "SELL")
+                msg.body = jsonpickle.encode({"coinid": coinid, "quantity": coin.quantity})

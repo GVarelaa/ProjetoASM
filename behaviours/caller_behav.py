@@ -4,6 +4,7 @@ import jsonpickle
 from datetime import datetime
 from spade.behaviour import PeriodicBehaviour
 from spade.message import Message
+from utils.call import Call
 
 class CallerBehaviour(PeriodicBehaviour):
     async def on_start(self):
@@ -34,7 +35,8 @@ class CallerBehaviour(PeriodicBehaviour):
                     msg = Message(to="manager@localhost")
                     msg.set_metadata("performative", "CALL")
                     
-                    msg.body = jsonpickle.encode({"ticker": match.group(0)})
+                    call = Call(match.group(0))
+                    msg.body = jsonpickle.encode(call)
 
                     await self.send(msg)
                 else:
