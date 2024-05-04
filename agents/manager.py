@@ -95,12 +95,6 @@ class ManagerAgent(Agent):
     def get_influencers(self):
         return self.influencers
     
-    def add_influencer(self, influencer):
-        self.influencers.append(influencer)
-    
-    def remove_influencer(self, influencer):
-        self.influencers.remove(influencer)
-    
     def get_history(self):
         return self.history
     
