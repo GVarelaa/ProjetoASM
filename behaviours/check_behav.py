@@ -12,7 +12,6 @@ class CheckBehaviour(PeriodicBehaviour):
 
         for coinid in self.agent.portfolio:
             coin = self.agent.portfolio[coinid]
-            print(coin)
 
             if coin.profit >= self.agent.takeprofit:
                 # Vender 

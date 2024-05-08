@@ -59,7 +59,7 @@ class ManagerBehaviour(CyclicBehaviour):
                     msg = Message(to="broker@localhost")
                     msg.set_metadata("performative", "BUY")
 
-                    trade = Trade(coinid, balance=100) # Balance deve vir da interface
+                    trade = Trade(coinid, balance=self.agent.trade_balance) # Balance deve vir da interface
                     msg.body = jsonpickle.encode(trade)
 
                     await self.send(msg)

@@ -3,39 +3,12 @@ from behaviours.manager_behav import ManagerBehaviour
 from behaviours.check_behav import CheckBehaviour
 
 class ManagerAgent(Agent):
-    # Tuplo -> Preço, Quantiadade de Tokens
     stoploss = 10 # percentagem stoploss -> definir pela interface
     takeprofit = 5 # percentagem takeprofit -> definir pela interface
+    trade_balance = 0
     balance = None
     portfolio = {}
 
-    """
-    portfolio = {
-            "Bitcoin": (10.0, 5.0),
-            "Ethereum": (5, 3.0),
-            "Litecoin": (10, 2.0),
-            "Ripple": (10, 1.5),
-            "Bitcoin Cash": (15, 6.0),
-            "Cardano": (8, 1.2),
-            "Polkadot": (12, 4.5),
-            "Stellar": (20, 0.8),
-            "Chainlink": (6, 5.2),
-            "USD Coin": (100, 1.0),
-            "Binance Coin": (3, 20.0),
-            "Tether": (200, 1.0),
-            "Dogecoin": (50, 0.3),
-            "Wrapped Bitcoin": (7, 40000.0),
-            "Uniswap": (25, 30.0),
-            "Bitcoin SV": (4, 180.0),
-            "Aave": (2, 400.0),
-            "EOS": (30, 3.5),
-            "Monero": (3, 150.0),
-            "TRON": (500, 0.05),
-            "NEO": (12, 20.0)
-        }
-    """
-
-    influencers = ["Influencer 1", "Influencer 2", "Influencer 3"] 
     history = ["JohnDoe : selling 7 of Ethereum at 13974.87",
     "JohnDoe : buying 3 of Litecoin at 23150.47",
     "JohnDoe : buying 2 of Bitcoin at 35298.93",
@@ -76,8 +49,6 @@ class ManagerAgent(Agent):
     "JohnDoe : buying 6 of Ripple at 33601.81",
     "JohnDoe : buying 3 of Litecoin at 37792.76",
     "JohnDoe : selling 10 of Ethereum at 48928.17"]
-    threshold = 0
-    loss = 0
     
     
     async def setup(self):
@@ -89,27 +60,9 @@ class ManagerAgent(Agent):
         self.add_behaviour(self.a)
         self.add_behaviour(self.b)
     
-    def get_portfolio(self):
-        return self.portfolio
-    
-    def get_influencers(self):
-        return self.influencers
-    
     def get_history(self):
         return self.history
     
     def add_history(self, data):
         self.history.append(data)
-    
-    def get_threshold(self):
-        return self.threshold
-    
-    def set_threshold(self, threshold):
-        self.threshold = threshold
-    
-    def get_loss(self):
-        return self.loss
-    
-    def set_loss(self, loss):
-        self.loss = loss
     

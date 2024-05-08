@@ -1,6 +1,7 @@
 import ttkbootstrap as ttk
 from ttkbootstrap.tableview import Tableview
 from ttkbootstrap.constants import *
+from ttkbootstrap.toast import ToastNotification
 from agents.manager import ManagerAgent
 from agents.caller import CallerAgent
 
@@ -18,9 +19,7 @@ class PortfolioPage:
         self.current_page = 1
         self.rows_per_page = 10
         self.manager = manager
-        #vou assumir que a wallet seja assim
-        self.wallet = self.manager.get_portfolio()
-
+        self.wallet = self.manager.portfolio
 
         self.create_widgets()
     
@@ -33,20 +32,21 @@ class PortfolioPage:
         frame = ttk.Frame(self.root, bootstyle="dark")
         frame.pack(padx=20, pady=20)
         
-        total = ttk.Label(frame, text=f"Total: {self.calcular_total_criptomoedas()}", bootstyle="light", font=('Lato', 18, 'bold'))
+        total = ttk.Label(frame, text=f"Total: {self.wallet_value()}", bootstyle="light", font=('Lato', 18, 'bold'))
         total.pack(pady=5)
         
         coldata = [
-            {"text": "Crypto", "stretch": False},
-            "Quantity",
-            {"text": "Price", "stretch": True},
-            {"text": "Total Value", "stretch": False},
+            {"text": "Crypto", "stretch": False, "width": 170},
+            {"text": "Quantity", "stretch": False, "width": 170},
+            {"text": "Price", "stretch": False, "width": 170},
+            {"text": "Value", "stretch": False, "width": 170},
+            {"text": "Profit", "stretch": False, "width": 170},
         ]   
         
         rowdata = []
         
-        for criptomoeda, (quantidade, valor) in self.wallet.items():
-            rowdata.append((criptomoeda, quantidade, valor, quantidade * valor))
+        for asset in self.wallet.values():
+            rowdata.append((asset.name, asset.quantity, asset.current_price, asset.value, asset.profit))
         
         dt = Tableview(
             master=self.root,
@@ -59,15 +59,15 @@ class PortfolioPage:
         )
         dt.pack(fill=BOTH, expand=YES, padx=10, pady=10)
         
-        
         # Button to go back to the previous page
         return_button = ttk.Button(self.root, text="Back", command=self.return_to_main, bootstyle="light-outline")
         return_button.pack(pady=50)
     
-    def calcular_total_criptomoedas(self):
+    def wallet_value(self):
         total = 0
-        for criptomoeda, (quantidade, valor) in self.wallet.items():
-            total += quantidade * valor
+        for asset in self.wallet.values():
+            total += asset.value
+
         return total
 
         
@@ -89,64 +89,78 @@ class SettingsPage:
         self.root.title("Settings")
         self.root.geometry("600x500")
         self.manager = manager
-        self.threshold_value = self.manager.get_threshold()
-        self.loss_value = self.manager.get_loss()
+        self.takeprofit = self.manager.takeprofit
+        self.stoploss = self.manager.stoploss
+        self.trade_balance = self.manager.trade_balance
 
         self.create_widgets()
 
     def create_widgets(self):
-        
         # Label for the page title
         title_label = ttk.Label(self.root, text="Settings", font=('Lato', 30), bootstyle="light")
         title_label.pack(pady=10)
         
-       # Frame to contain label, textbox, and button
+        # Frame to contain label, textbox, and button
         frame = ttk.Frame(self.root)
         frame.pack(pady=20)
 
-        #Threshold
-        # Label for displaying current threshold value
-        self.current_threshold_label = ttk.Label(frame, text=f"Threshold: {self.threshold_value}", bootstyle="light", font=('Lato', 18, 'bold'))
+        # Takeprofit
+        # Label for displaying current takeprofit value
+        self.current_threshold_label = ttk.Label(frame, text=f"Takeprofit: {self.takeprofit}", bootstyle="light", font=('Lato', 18, 'bold'))
         self.current_threshold_label.grid(row=0, column=0, padx=(0, 5))
 
         # Text box for entering new threshold value
-        self.threshold_entry = ttk.Entry(frame, width=15, style="primary.TEntry")
-        self.threshold_entry.insert(0,self.threshold_value)  # Set initial value
-        self.threshold_entry.grid(row=0, column=1, padx=(50,0))
+        self.takeprofit_entry = ttk.Entry(frame, width=15, style="primary.TEntry")
+        self.takeprofit_entry.insert(0, self.takeprofit)  # Set initial value
+        self.takeprofit_entry.grid(row=0, column=1, padx=(50,0))
 
         # Button to save new threshold value
-        save_button = ttk.Button(frame, text="Change", command=self.save_threshold, bootstyle="light-outline")
+        save_button = ttk.Button(frame, text="Change", command=self.save_takeprofit, bootstyle="light-outline")
         save_button.grid(row=0, column=2, padx=(15, 0))
         
         
         #Loss
         # Label for displaying current loss value
-        self.current_loss_label = ttk.Label(frame, text=f"Loss: {self.loss_value}", bootstyle="light", font=('Lato', 18, 'bold'))
+        self.current_loss_label = ttk.Label(frame, text=f"Stoploss: {self.stoploss}", bootstyle="light", font=('Lato', 18, 'bold'))
         self.current_loss_label.grid(row=1, column=0, padx=(0, 5), pady=(20,0))
         
         # Text box for entering new loss value
-        self.loss_entry = ttk.Entry(frame, width=15, style="primary.TEntry")
-        self.loss_entry.insert(0,self.loss_value)
-        self.loss_entry.grid(row=1, column=1, padx=(50,0), pady=(20,0))
+        self.stoploss_entry = ttk.Entry(frame, width=15, style="primary.TEntry")
+        self.stoploss_entry.insert(0,self.stoploss)
+        self.stoploss_entry.grid(row=1, column=1, padx=(50,0), pady=(20,0))
         
         # Button to save new loss value
         save_button_loss= ttk.Button(frame, text="Change", command=self.save_loss, bootstyle="light-outline")
         save_button_loss.grid(row=1, column=2, padx=(15, 0), pady=(20,0))
+
+
+        # Trade Balance
+        self.current_balance_label = ttk.Label(frame, text=f"Trade balance: {self.trade_balance}", bootstyle="light", font=('Lato', 18, 'bold'))
+        self.current_balance_label.grid(row=2, column=0, padx=(0, 5), pady=(20,0))
+        
+        # Text box for entering new loss value
+        self.balance_entry = ttk.Entry(frame, width=15, style="primary.TEntry")
+        self.balance_entry.insert(0, self.trade_balance)
+        self.balance_entry.grid(row=2, column=1, padx=(50,0), pady=(20,0))
+        
+        # Button to save new loss value
+        save_button_balance= ttk.Button(frame, text="Change", command=self.save_balance, bootstyle="light-outline")
+        save_button_balance.grid(row=2, column=2, padx=(15, 0), pady=(20,0))
         
         # Button to go back to the previous page
         return_button = ttk.Button(self.root, text="Back", command=self.return_to_main, bootstyle="light-outline")
         return_button.pack(pady=100)
         
-    def save_threshold(self):
+    def save_takeprofit(self):
         # Get the threshold value from the entry widget
-        threshold_value = self.threshold_entry.get()
+        takeprofit = self.takeprofit_entry.get()
         # Process the threshold value as needed (e.g., save to file, update configuration)
-        self.threshold_value = threshold_value
-        self.current_threshold_label.config(text=f"Threshold: {self.threshold_value}")
-        self.manager.set_threshold(self.threshold_value)
+        self.takeprofit = takeprofit
+        self.current_threshold_label.config(text=f"Takeprofit: {self.takeprofit}")
+        self.manager.takeprofit = self.takeprofit
         toast = ToastNotification(
             title="Settings",
-            message="Threshold value successfully saved!",
+            message="Takeprofit value successfully saved!",
             duration=3000,
             bootstyle="dark",
             position=(70,30,"ne")
@@ -155,13 +169,26 @@ class SettingsPage:
 
     
     def save_loss(self):
-        loss_value = self.loss_entry.get()
-        self.loss_value = loss_value
-        self.current_loss_label.config(text=f"Loss: {self.loss_value}")
-        self.manager.set_loss(self.loss_value)
+        loss_value = self.stoploss_entry.get()
+        self.stoploss = loss_value
+        self.current_loss_label.config(text=f"Stoploss: {self.stoploss}")
+        self.manager.stoploss = self.stoploss
         toast = ToastNotification(
             title="Settings",
-            message="Loss value successfully saved!",
+            message="Stoploss value successfully saved!",
+            duration=3000,
+            bootstyle="dark",
+        )
+        toast.show_toast()
+
+    def save_balance(self):
+        balance_value = self.balance_entry.get()
+        self.trade_balance = balance_value
+        self.current_balance_label.config(text=f"Trade balance: {self.trade_balance}")
+        self.manager.trade_balance = self.trade_balance
+        toast = ToastNotification(
+            title="Settings",
+            message="Trade balance value successfully saved!",
             duration=3000,
             bootstyle="dark",
         )
@@ -387,7 +414,6 @@ class MainPage:
         self.create_widgets()
 
     def create_widgets(self):
-        
         # Logo
         # Label para exibir o texto "Portfolio Manager"
         label = ttk.Label(self.root, text="Portfolio Manager", font=('Lato', 42), bootstyle="light")
@@ -396,6 +422,10 @@ class MainPage:
         # Influencer
         influencers_button = ttk.Button(bootstyle="light-outline", text="Influencers", width=30,command=self.open_influencers_page)
         influencers_button.pack(pady=(50,0))
+
+        # Portfolio
+        portfolio_button = ttk.Button(bootstyle="light-outline", text="Portfolio", width=30,command=self.open_portfolio_page)
+        portfolio_button.pack(pady=(15,0))
         
         # History
         history_button = ttk.Button(bootstyle="light-outline", text="History", width=30,command=self.open_history_page)
@@ -405,15 +435,11 @@ class MainPage:
         settings_button = ttk.Button(bootstyle="light-outline", text="Settings", width=30,command=self.open_settings_page)
         settings_button.pack(pady=(15,0))
         
-        # Portfolio
-        portfolio_button = ttk.Button(bootstyle="light-outline", text="Portfolio", width=30,command=self.open_portfolio_page)
-        portfolio_button.pack(pady=(15,0))
 
     def open_influencers_page(self):
         self.root.destroy()  # Close current window
         ttk.Style.instance = None
         InfluencersPage(self.manager)
-        
 
     def open_history_page(self):
         self.root.destroy()  # Close current window
