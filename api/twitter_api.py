@@ -3,7 +3,7 @@ from twitter.scraper import Scraper
 from datetime import datetime
 
 ## sign-in with credentials
-scraper = Scraper("guilherme.lukon@gmail.com", "randommeme65920", "projetoasm123")
+scraper = Scraper("", "", "")
 app = Flask(__name__)
 
 @app.route('/tweets/<user>')
