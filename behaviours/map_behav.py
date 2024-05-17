@@ -27,8 +27,6 @@ class MapBehaviour(CyclicBehaviour):
                 reply.body = jsonpickle.encode(data)
 
                 await self.send(reply)
-        else:
-            print(f"{self.agent.jid} did not received any message after 10 seconds")
 
 
             

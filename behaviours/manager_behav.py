@@ -1,4 +1,5 @@
 import jsonpickle
+import datetime
 from spade.behaviour import CyclicBehaviour
 from spade.message import Message
 from agents.collector import CollectorAgent
@@ -6,6 +7,7 @@ from agents.collector import CollectorAgent
 from utils.brokerMessage import brokerMessage
 from utils.asset import Asset
 from utils.trade import Trade
+from utils.history import History
 
 
 XMPP_SERVER = 'localhost'
@@ -59,22 +61,28 @@ class ManagerBehaviour(CyclicBehaviour):
                     msg = Message(to="broker@localhost")
                     msg.set_metadata("performative", "BUY")
 
-                    trade = Trade(coinid, balance=self.agent.trade_balance) # Balance deve vir da interface
+                    trade = Trade(coinid, balance=self.agent.trade_balance)
                     msg.body = jsonpickle.encode(trade)
 
                     await self.send(msg)
 
             elif msg.get_metadata("performative") == "BUYREPLY":
-                # RECEBE A QUANTIDADE DE TOKENS QUE COMPROU E A QUE PREÇO
                 coinid = data.coinid
 
+                timestamp = datetime.datetime.now().strftime('%d-%m-%Y %H:%M')
+                history = History(timestamp, self.agent.portfolio[coinid].name, data.quantity, data.price, self.agent.balance)
+            
+                self.agent.balance -= data.balance
+
                 self.agent.portfolio[coinid].set_info(data.price, data.quantity)
+                self.agent.history.append(history)
 
             elif msg.get_metadata("performative") == "SELLREPLY":
                 coinid = data.coinid
                 self.agent.balance += data.balance
 
-                del self.agent.portfolio[coinid]
+                timestamp = datetime.datetime.now().strftime('%d-%m-%Y %H:%M')
+                history = History(timestamp, self.agent.portfolio[coinid].name, data.quantity, data.price, self.agent.balance)
 
-        else:
-            print(f"{str(self.agent.jid).partition('@')[0]} : message timeout after 10 seconds")
+                del self.agent.portfolio[coinid]
+                self.agent.history.append(history)

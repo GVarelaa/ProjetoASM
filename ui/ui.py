@@ -15,7 +15,7 @@ class PortfolioPage:
     def __init__(self, manager):
         self.root = ttk.Window(themename="vapor")
         self.root.title("Settings")
-        self.root.geometry("800x600")
+        self.center_window(800, 600)
         self.current_page = 1
         self.rows_per_page = 10
         self.manager = manager
@@ -28,7 +28,6 @@ class PortfolioPage:
         title_label = ttk.Label(self.root, text="Portfolio", font=('Lato', 30), bootstyle="light")
         title_label.pack(pady=10)
         
-        # Frame
         frame = ttk.Frame(self.root, bootstyle="dark")
         frame.pack(padx=20, pady=20)
         
@@ -40,13 +39,18 @@ class PortfolioPage:
             {"text": "Quantity", "stretch": False, "width": 170},
             {"text": "Price", "stretch": False, "width": 170},
             {"text": "Value", "stretch": False, "width": 170},
-            {"text": "Profit", "stretch": False, "width": 170},
+            {"text": "Profit (%)", "stretch": False, "width": 170},
         ]   
         
         rowdata = []
         
         for asset in self.wallet.values():
-            rowdata.append((asset.name, asset.quantity, asset.current_price, asset.value, asset.profit))
+            formatted_quantity = f"{asset.quantity:.4f}"
+            formatted_current_price = f"{asset.current_price:.2f}"
+            formatted_value = f"{asset.value:.4f}"
+            formatted_profit = f"{asset.profit:.4f}"
+
+            rowdata.append((asset.name, formatted_quantity, formatted_current_price, formatted_value, formatted_profit))
         
         dt = Tableview(
             master=self.root,
@@ -64,30 +68,35 @@ class PortfolioPage:
         return_button.pack(pady=50)
     
     def wallet_value(self):
-        total = 0
+        total = self.manager.balance
         for asset in self.wallet.values():
             total += asset.value
 
         return total
 
-        
     def return_to_main(self):
-        # Import MainPage class here to avoid circular import
         from main import MainPage
         
-        # Destroy current page
         self.root.destroy()
 
-        # Create and display Main page
         ttk.Style.instance = None
         MainPage(self.manager)
+
+    def center_window(self, width, height):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
 
 
 class SettingsPage:
     def __init__(self, manager):
         self.root = ttk.Window(themename="vapor")
         self.root.title("Settings")
-        self.root.geometry("600x500")
+        self.center_window(800, 600)
         self.manager = manager
         self.takeprofit = self.manager.takeprofit
         self.stoploss = self.manager.stoploss
@@ -100,7 +109,6 @@ class SettingsPage:
         title_label = ttk.Label(self.root, text="Settings", font=('Lato', 30), bootstyle="light")
         title_label.pack(pady=10)
         
-        # Frame to contain label, textbox, and button
         frame = ttk.Frame(self.root)
         frame.pack(pady=20)
 
@@ -152,9 +160,8 @@ class SettingsPage:
         return_button.pack(pady=100)
         
     def save_takeprofit(self):
-        # Get the threshold value from the entry widget
-        takeprofit = self.takeprofit_entry.get()
-        # Process the threshold value as needed (e.g., save to file, update configuration)
+        takeprofit = float(self.takeprofit_entry.get())
+
         self.takeprofit = takeprofit
         self.current_threshold_label.config(text=f"Takeprofit: {self.takeprofit}")
         self.manager.takeprofit = self.takeprofit
@@ -169,7 +176,8 @@ class SettingsPage:
 
     
     def save_loss(self):
-        loss_value = self.stoploss_entry.get()
+        loss_value = float(self.stoploss_entry.get())
+
         self.stoploss = loss_value
         self.current_loss_label.config(text=f"Stoploss: {self.stoploss}")
         self.manager.stoploss = self.stoploss
@@ -182,7 +190,8 @@ class SettingsPage:
         toast.show_toast()
 
     def save_balance(self):
-        balance_value = self.balance_entry.get()
+        balance_value = float(self.balance_entry.get())
+
         self.trade_balance = balance_value
         self.current_balance_label.config(text=f"Trade balance: {self.trade_balance}")
         self.manager.trade_balance = self.trade_balance
@@ -195,60 +204,61 @@ class SettingsPage:
         toast.show_toast()
     
     def return_to_main(self):
-        # Import MainPage class here to avoid circular import
         from main import MainPage
         
-        # Destroy current page
         self.root.destroy()
 
-        # Create and display Main page
         ttk.Style.instance = None
         MainPage(self.manager)
+
+    def center_window(self, width, height):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
     
 
 class HistoryPage:
     def __init__(self, manager):
         self.root = ttk.Window(themename="vapor")
         self.root.title("History")
-        self.root.geometry("600x500")
+        self.center_window(800, 600)
         self.manager = manager
-        self.history_data = self.manager.get_history()
+        self.history = self.manager.history
         self.current_page = 1
         self.rows_per_page = 10
-        
 
         self.create_widgets()
 
     def create_widgets(self):
-        
-        # Label for the page title
         title_label = ttk.Label(self.root, text="History", font=('Lato', 30), bootstyle="light")
         title_label.pack(pady=10)
         
         frame = ttk.Frame(self.root, bootstyle="dark")
         frame.pack(padx=20, pady=20)
 
-        # Calcular o índice inicial e final para a página atual
         start_index = (self.current_page - 1) * self.rows_per_page
-        end_index = min(start_index + self.rows_per_page, len(self.history_data))
+        end_index = min(start_index + self.rows_per_page, len(self.history))
         
-        if len(self.history_data) == 0:
+        if len(self.history) == 0:
             label = ttk.Label(frame, text="No data available", bootstyle="light")
             label.pack(anchor="w", pady=5)
 
         else:
-            # Exibir as strings na página atual
             for i in range(start_index, end_index):
-                label = ttk.Label(frame, text=self.history_data[i], bootstyle="light")
+                history = self.history[i]
+
+                text = f"{history.timestamp} | Asset: {history.asset} | Quantity: {history.quantity:.4f} | Price: {history.price:.2f} | Balance: {history.balance:.2f}"
+                label = ttk.Label(frame, text=text, bootstyle="light")
                 label.pack(anchor="w",padx=(30,0),pady=5)
 
-            # Adicionar controles de paginação, se necessário
-            if len(self.history_data) > self.rows_per_page:
+            if len(self.history) > self.rows_per_page:
                 pagination_frame = ttk.Frame(self.root)  # Frame para os botões de paginação com estilo padrão
                 pagination_frame.pack()
                 self.create_pagination_controls(pagination_frame)
-        
-    
         
         # Button to go back to the previous page
         return_button = ttk.Button(self.root, text="Back", command=self.return_to_main, bootstyle="light-outline")
@@ -256,7 +266,7 @@ class HistoryPage:
     
     def create_pagination_controls(self, frame):
         # Calcular o número total de páginas
-        total_pages = (len(self.history_data) + self.rows_per_page - 1) // self.rows_per_page
+        total_pages = (len(self.history) + self.rows_per_page - 1) // self.rows_per_page
 
         # Botão "Página Anterior"
         prev_button = ttk.Button(frame, text="Página Anterior", command=self.prev_page, bootstyle="light-outline")
@@ -276,36 +286,40 @@ class HistoryPage:
             self.refresh_page()
 
     def next_page(self):
-        total_pages = (len(self.history_data) + self.rows_per_page - 1) // self.rows_per_page
+        total_pages = (len(self.history) + self.rows_per_page - 1) // self.rows_per_page
         if self.current_page < total_pages:
             self.current_page += 1
             self.refresh_page()
 
     def refresh_page(self):
-        # Limpar o frame atual
         for widget in self.root.winfo_children():
             widget.destroy()
-        # Criar novamente os widgets com a página atualizada
+
         self.create_widgets()
     
     def return_to_main(self):
-        # Import MainPage class here to avoid circular import
         from main import MainPage
         
-        # Destroy current page
         self.root.destroy()
 
-        # Create and display Main page
         ttk.Style.instance = None
         MainPage(self.manager)
 
+    def center_window(self, width, height):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
 
 
 class InfluencersPage:
     def __init__(self, manager):
         self.root = ttk.Window(themename="vapor")
         self.root.title("Influencers")
-        self.root.geometry("600x500")
+        self.center_window(800, 600)
         self.manager = manager
 
         self.create_widgets()
@@ -351,19 +365,19 @@ class InfluencersPage:
         
 
     def add_influencer(self):
-        influencer_name = self.influencer_entry.get()  # Get the influencer name from the entry widget
-        if influencer_name:  # Check if the influencer name is not empty
+        influencer_name = self.influencer_entry.get() 
+        if influencer_name:
             influencers.append(influencer_name) 
             
             caller = CallerAgent(f"{influencer_name}@{XMPP_SERVER}", PASSWORD)
+            caller.user = influencer_name
 
             caller.start(auto_register=True)
 
             influencers_agents[influencer_name] = caller
 
-            self.update_widgets()  # Update the widgets to reflect the changes
+            self.update_widgets()
         else:
-            # You may want to display a message or handle empty input differently
             print("Please enter a valid influencer name.")
 
     def remove_influencer(self, influencer):
@@ -402,13 +416,25 @@ class InfluencersPage:
         # Create and display Main page
         ttk.Style.instance = None
         MainPage(self.manager)
+
+    def center_window(self, width, height):
+        # Obter as dimensões da tela do sistema
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        # Calcular a posição x, y para centralizar a janela
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+
+        # Definir a geometria da janela centralizada
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
         
 
 class MainPage:
     def __init__(self, manager: ManagerAgent):
         self.root = ttk.Window(themename="vapor")
         self.root.title("Portfolio Manager")
-        self.root.geometry("600x500")
+        self.center_window(800, 600)
         self.manager  = manager
         
         self.create_widgets()
@@ -455,4 +481,13 @@ class MainPage:
         self.root.destroy()
         ttk.Style.instance = None
         PortfolioPage(self.manager)
+
+    def center_window(self, width, height):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
     

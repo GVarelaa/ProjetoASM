@@ -15,9 +15,11 @@ class Asset:
         self.value = quantity * initial_price
 
     def update(self, new_price):
+        new_value = self.quantity * new_price
+        
         self.current_price = new_price
-        self.value = self.quantity * new_price
-        self.profit = (new_price - self.initial_price) * self.quantity
+        self.profit = ((new_value - self.value) / self.value ) * 100
+        self.value = new_value
         
     def __str__(self):
         return f"Asset({self.coinid}, {self.name}, Quantity: {self.quantity}, Initial Price: {self.initial_price}, Current Price: {self.current_price}, Value: {self.value}, Profit: {self.profit})"

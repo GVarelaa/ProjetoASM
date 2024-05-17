@@ -2,12 +2,12 @@ from spade.agent import Agent
 from behaviours.caller_behav import CallerBehaviour
 
 class CallerAgent(Agent):
-    user = "randommeme65920" #"randommeme65920"
+    user = ""
     last_tweet = {}
     first_time = True
 
     async def setup(self):
         print(f"{str(self.jid).partition('@')[0]} : starting...")
 
-        self.b = CallerBehaviour(period=10)
+        self.b = CallerBehaviour(period=20)
         self.add_behaviour(self.b)

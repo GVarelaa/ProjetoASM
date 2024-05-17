@@ -9,6 +9,8 @@ class CheckBehaviour(PeriodicBehaviour):
 
     async def run(self):
         print(f"Portfolio : {self.agent.portfolio}")
+        print(f"Takeprofit : {self.agent.takeprofit}")
+        print(f"Stoploss : {self.agent.stoploss}")
 
         for coinid in self.agent.portfolio:
             coin = self.agent.portfolio[coinid]
@@ -22,7 +24,9 @@ class CheckBehaviour(PeriodicBehaviour):
 
                 msg.body = jsonpickle.encode(trade)
 
-            elif coin.profit <= self.agent.stoploss:
+                await self.send(msg)
+
+            elif coin.profit <= self.agent.stoploss*(-1):
                 # Vender
                 msg = Message(to="broker@localhost")
                 msg.set_metadata("performative", "SELL")
@@ -30,3 +34,5 @@ class CheckBehaviour(PeriodicBehaviour):
                 trade = Trade(coinid, quantity=coin.quantity)
 
                 msg.body = jsonpickle.encode(trade)
+
+                await self.send(msg)

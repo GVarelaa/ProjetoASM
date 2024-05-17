@@ -1,4 +1,3 @@
-from ui.portfolio import PortfolioPage
 from agents.manager import ManagerAgent
 from agents.collector import CollectorAgent
 from agents.mapper import MapperAgent
@@ -14,7 +13,6 @@ XMPP_SERVER = 'localhost'
 PASSWORD = 'admin'
 
 if __name__ == "__main__":
-    caller = CallerAgent(f"caller@{XMPP_SERVER}", PASSWORD)
     mapper = MapperAgent(f"mapper@{XMPP_SERVER}", PASSWORD)
     broker = BrokerAgent(f"broker@{XMPP_SERVER}", PASSWORD)
     manager = ManagerAgent(f"manager@{XMPP_SERVER}", PASSWORD)
@@ -34,11 +32,6 @@ if __name__ == "__main__":
 
     time.sleep(1)
 
-    res_caller = caller.start(auto_register=True)
-    res_caller.result()
-
-    time.sleep(1)
-
     app = MainPage(manager)
     app.root.mainloop()
 
@@ -48,7 +41,6 @@ if __name__ == "__main__":
             time.sleep(1)
         except KeyboardInterrupt:
             # stop all agents
-            caller.stop()
             manager.stop()
             broker.stop()
             mapper.stop()

@@ -29,6 +29,7 @@ class BrokerBehaviour(CyclicBehaviour):
                     
                 data.price = price
                 data.quantity = quantity
+                data.balance = price * quantity
 
                 msg = Message(to=str(msg.sender)) 
                 msg.set_metadata("performative", "BUYREPLY") 
@@ -46,7 +47,7 @@ class BrokerBehaviour(CyclicBehaviour):
                 data.price = price
                 data.balance = balance
 
-                msg = Message(to=msg.sender) 
+                msg = Message(to=str(msg.sender)) 
                 msg.set_metadata("performative", "SELLREPLY") 
                 msg.body = jsonpickle.encode(data)
                 
@@ -54,6 +55,3 @@ class BrokerBehaviour(CyclicBehaviour):
 
             #else:
                     #msg_to_manager.set_metadata("performative", "refuse") 
-
-            else:
-                print(f"{str(self.agent.jid).partition('@')[0]} : message timeout after 10 seconds")
