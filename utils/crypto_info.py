@@ -36,7 +36,7 @@ def get_coinid(ticker):
     print(matching_coins)
 
     if len(matching_coins) == 0:
-        return "No matching coin found"
+        return None
 
     url = f"https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
     

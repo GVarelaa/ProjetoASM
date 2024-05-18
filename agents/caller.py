@@ -7,7 +7,6 @@ class CallerAgent(Agent):
     first_time = True
 
     async def setup(self):
-        print(f"{str(self.jid).partition('@')[0]} : starting...")
-
         self.b = CallerBehaviour(period=20)
+        
         self.add_behaviour(self.b)

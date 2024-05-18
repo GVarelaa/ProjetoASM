@@ -1,32 +1,41 @@
+import jsonpickle
 from spade.behaviour import CyclicBehaviour
 from spade.message import Message
 from utils.crypto_info import get_coinid
-import jsonpickle
-
+from utils.log import Log
 
 class MapBehaviour(CyclicBehaviour):
     async def on_start(self):
-        print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
+        Log.log(str(self.agent.jid).partition('@')[0], "starting mapping behaviour...")
 
     async def run(self):
         msg = await self.receive(timeout=10)
         
         if msg:
-            print(f"{self.agent.jid} : Message received: {msg.body}")
-
             data = jsonpickle.decode(msg.body)
             
-            if msg.get_metadata("performative") == "MAP":
-                coinid, name = get_coinid(data.ticker)
+            performative = msg.get_metadata("performative")
 
-                data.coinid = coinid
-                data.name = name
+            Log.log(str(self.agent.jid).partition('@')[0], f"{performative} received")
+            
+            if performative == "request":
+                coin = get_coinid(data.ticker)
 
-                reply = Message(to=str(msg.sender))
-                reply.set_metadata("performative", "MAPREPLY")
-                reply.body = jsonpickle.encode(data)
+                if coin:
+                    data.coinid = coin[0]
+                    data.name = coin[1]
 
-                await self.send(reply)
+                    reply = Message(to=str(msg.sender))
+                    reply.set_metadata("performative", "mapper_confirm")
+                    reply.body = jsonpickle.encode(data)
+
+                    await self.send(reply)
+                else:
+                    reply = Message(to=str(msg.sender))
+                    reply.set_metadata("performative", "mapper_failure")
+
+                    await self.send(reply)
+
 
 
             

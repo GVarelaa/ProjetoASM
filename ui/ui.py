@@ -45,9 +45,9 @@ class PortfolioPage:
         rowdata = []
         
         for asset in self.wallet.values():
-            formatted_quantity = f"{asset.quantity:.4f}"
+            formatted_quantity = f"{asset.quantity:.2f}"
             formatted_current_price = f"{asset.current_price:.2f}"
-            formatted_value = f"{asset.value:.4f}"
+            formatted_value = f"{asset.value:.2f}"
             formatted_profit = f"{asset.profit:.4f}"
 
             rowdata.append((asset.name, formatted_quantity, formatted_current_price, formatted_value, formatted_profit))
@@ -72,7 +72,7 @@ class PortfolioPage:
         for asset in self.wallet.values():
             total += asset.value
 
-        return total
+        return round(total, 2)
 
     def return_to_main(self):
         from main import MainPage
@@ -251,7 +251,7 @@ class HistoryPage:
             for i in range(start_index, end_index):
                 history = self.history[i]
 
-                text = f"{history.timestamp} | Asset: {history.asset} | Quantity: {history.quantity:.4f} | Price: {history.price:.2f} | Balance: {history.balance:.2f}"
+                text = f"{history.timestamp} | {history.type} | Asset: {history.asset} | Quantity: {history.quantity:.4f} | Price: {history.price:.2f} | Balance: {history.balance:.2f}"
                 label = ttk.Label(frame, text=text, bootstyle="light")
                 label.pack(anchor="w",padx=(30,0),pady=5)
 

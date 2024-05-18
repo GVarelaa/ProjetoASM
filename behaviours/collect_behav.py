@@ -1,16 +1,17 @@
+import jsonpickle
 from spade.behaviour import PeriodicBehaviour
 from utils.crypto_info import get_market_data
 from utils.data import Data
+from utils.log import Log
 from spade.message import Message
-import jsonpickle
 
 class CollectBehaviour(PeriodicBehaviour):
     async def on_start(self):
-        print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
+        Log.log(str(self.agent.jid).partition('@')[0], "starting collector behaviour...")
 
     async def run(self):
         msg = Message(to="manager@localhost")
-        msg.set_metadata("performative", "INFO")
+        msg.set_metadata("performative", "collector_inform")
 
         data = get_market_data(self.agent.crypto)
 

@@ -5,10 +5,11 @@ from datetime import datetime
 from spade.behaviour import PeriodicBehaviour
 from spade.message import Message
 from utils.call import Call
+from utils.log import Log
 
 class CallerBehaviour(PeriodicBehaviour):
     async def on_start(self):
-        print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
+        Log.log(str(self.agent.jid).partition('@')[0], "starting caller behaviour...")
 
     async def run(self):
         response = requests.get(f'http://127.0.0.1:5000/tweets/{self.agent.user}')
@@ -36,12 +37,11 @@ class CallerBehaviour(PeriodicBehaviour):
 
                     if match is not None:
                         msg = Message(to="manager@localhost")
-                        msg.set_metadata("performative", "CALL")
+                        msg.set_metadata("performative", "call_inform")
                         
                         call = Call(match.group(1))
                         msg.body = jsonpickle.encode(call)
 
-                        print("A enviar call...")
                         await self.send(msg)
                     else:
                         print("Ticker not found")

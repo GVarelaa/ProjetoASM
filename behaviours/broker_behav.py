@@ -1,57 +1,71 @@
 import jsonpickle
+import random
 from spade.behaviour import CyclicBehaviour
 from spade.message import Message
-
-from utils.trade import Trade
+from utils.log import Log
 from utils.crypto_info import get_market_data
 
 class BrokerBehaviour(CyclicBehaviour):
     async def on_start(self):
-        print(f"{str(self.agent.jid).partition('@')[0]} : starting behaviour...")
+        Log.log(str(self.agent.jid).partition('@')[0], "starting broker behaviour...")
 
     async def run(self):
         msg = await self.receive(timeout=10)
 
         if msg:
             data = jsonpickle.decode(msg.body)
-            
+
             performative = msg.get_metadata("performative")
 
-            print(f"{str(self.agent.jid).partition('@')[0]} : {performative}")
-            print(f"{str(self.agent.jid).partition('@')[0]} : message received with content: " + str(data))
+            Log.log(str(self.agent.jid).partition('@')[0], f"{performative} received")
+   
+            if performative == "buy_request":
+                prob = random.random()
 
-            if msg.get_metadata("performative") == "BUY":
-                # NA REALIDADE TERÍAMOS DE USAR A API DE UMA CEX/DEX E COMPRAR -> VAMOS USAR UMA SIMULAÇÃO
-                coin_data = get_market_data(data.coinid)
+                if prob < 0.9:
+                    # NA REALIDADE TERÍAMOS DE USAR A API DE UMA CEX/DEX E COMPRAR -> VAMOS USAR UMA SIMULAÇÃO
+                    coin_data = get_market_data(data.coinid)
 
-                price = coin_data["quote"]["USD"]["price"]
-                quantity = data.balance / price
+                    price = coin_data["quote"]["USD"]["price"]
+                    quantity = data.balance / price
+                        
+                    data.price = price
+                    data.quantity = quantity
+                    data.balance = price * quantity
+
+                    reply = Message(to=str(msg.sender)) 
+                    reply.set_metadata("performative", "buy_confirm") 
+                    reply.body = jsonpickle.encode(data)
                     
-                data.price = price
-                data.quantity = quantity
-                data.balance = price * quantity
+                    await self.send(reply)
+                else:
+                    reply = Message(to=str(msg.sender))
+                    reply.set_metadata("performative", "buy_failure")
+                    reply.body = jsonpickle.encode(data)
 
-                msg = Message(to=str(msg.sender)) 
-                msg.set_metadata("performative", "BUYREPLY") 
-                msg.body = jsonpickle.encode(data)
-                
-                await self.send(msg)
+                    await self.send(reply)
             
-            elif msg.get_metadata("performative") == "SELL":
-                # NOVAMENTE UMA SIMULAÇÃO
-                coin_data = get_market_data(data.coinid)
+            elif performative == "sell_request":
+                prob = random.random()
 
-                price = coin_data["quote"]["USD"]["price"]
-                balance = data.quantity * price
+                if prob < 0.9:
+                    # NOVAMENTE UMA SIMULAÇÃO
+                    coin_data = get_market_data(data.coinid)
 
-                data.price = price
-                data.balance = balance
+                    price = coin_data["quote"]["USD"]["price"]
+                    balance = data.quantity * price
 
-                msg = Message(to=str(msg.sender)) 
-                msg.set_metadata("performative", "SELLREPLY") 
-                msg.body = jsonpickle.encode(data)
-                
-                await self.send(msg)
+                    data.price = price
+                    data.balance = balance
 
-            #else:
-                    #msg_to_manager.set_metadata("performative", "refuse") 
+                    msg = Message(to=str(msg.sender)) 
+                    msg.set_metadata("performative", "sell_confirm") 
+                    msg.body = jsonpickle.encode(data)
+                    
+                    await self.send(msg)
+                else:
+                    reply = Message(to=str(msg.sender))
+                    reply.set_metadata("performative", "sell_failure")
+                    reply.body = jsonpickle.encode(data)
+
+                    await self.send(reply)

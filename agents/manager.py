@@ -9,10 +9,9 @@ class ManagerAgent(Agent):
     balance = 10000 # default value
     portfolio = {}
     history = []
+    collectors = {}
     
     async def setup(self):
-        print(f"{str(self.jid).partition('@')[0]} : starting...")
-
         self.a = ManagerBehaviour()
         self.b = CheckBehaviour(period=30) # 30 segundos
 

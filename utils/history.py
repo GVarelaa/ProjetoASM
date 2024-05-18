@@ -1,6 +1,7 @@
 class History:
-    def __init__(self, timestamp, asset, quantity, price, balance):
+    def __init__(self, timestamp, type, asset, quantity, price, balance):
         self.timestamp = timestamp
+        self.type = type
         self.asset = asset
         self.quantity = quantity
         self.price = price

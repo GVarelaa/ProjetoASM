@@ -5,7 +5,6 @@ class CollectorAgent(Agent):
     crypto = None
 
     async def setup(self):
-        print(f"{str(self.jid).partition('@')[0]} : starting...")
+        self.b = CollectBehaviour(period=60)
 
-        self.b = CollectBehaviour(period=60) # 60 segundos
         self.add_behaviour(self.b)
