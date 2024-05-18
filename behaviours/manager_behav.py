@@ -56,6 +56,9 @@ class ManagerBehaviour(CyclicBehaviour):
 
                     await self.send(msg)
 
+            elif performative == "mapper_failure":
+                pass
+
             elif performative == "buy_confirm":
                 # Dar trigger a um agente collector e enviar mensagem ao broker pra comprar
                 coinid = data.coinid
@@ -91,4 +94,5 @@ class ManagerBehaviour(CyclicBehaviour):
                 del self.agent.portfolio[coinid]
                 self.agent.history.append(history)
 
-            #elif performative == "sell_failure":
+            elif performative == "sell_failure":
+                pass
