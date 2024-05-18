@@ -3,6 +3,6 @@ from behaviours.broker_behav import BrokerBehaviour
 
 class BrokerAgent(Agent):
     async def setup(self):
-        brokerBehav = BrokerBehaviour()
+        self.b = BrokerBehaviour()
         
-        self.add_behaviour(brokerBehav)
+        self.add_behaviour(self.b)

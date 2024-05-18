@@ -26,7 +26,7 @@ class CheckBehaviour(PeriodicBehaviour):
             elif coin.profit <= self.agent.stoploss*(-1):
                 # Vender
                 msg = Message(to="broker@localhost")
-                msg.set_metadata("performative", "SELL")
+                msg.set_metadata("performative", "sell_request")
 
                 trade = Trade(coinid, quantity=coin.quantity)
 

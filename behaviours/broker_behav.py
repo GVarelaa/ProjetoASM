@@ -48,24 +48,24 @@ class BrokerBehaviour(CyclicBehaviour):
             elif performative == "sell_request":
                 prob = random.random()
 
-                if prob < 0.9:
+                #if prob < 0.9:
                     # NOVAMENTE UMA SIMULAÇÃO
-                    coin_data = get_market_data(data.coinid)
+                coin_data = get_market_data(data.coinid)
 
-                    price = coin_data["quote"]["USD"]["price"]
-                    balance = data.quantity * price
+                price = coin_data["quote"]["USD"]["price"]
+                balance = data.quantity * price
 
-                    data.price = price
-                    data.balance = balance
+                data.price = price
+                data.balance = balance
 
-                    msg = Message(to=str(msg.sender)) 
-                    msg.set_metadata("performative", "sell_confirm") 
-                    msg.body = jsonpickle.encode(data)
-                    
-                    await self.send(msg)
-                else:
-                    reply = Message(to=str(msg.sender))
-                    reply.set_metadata("performative", "sell_failure")
-                    reply.body = jsonpickle.encode(data)
+                msg = Message(to=str(msg.sender)) 
+                msg.set_metadata("performative", "sell_confirm") 
+                msg.body = jsonpickle.encode(data)
+                
+                await self.send(msg)
+                #else:
+                #    reply = Message(to=str(msg.sender))
+                #    reply.set_metadata("performative", "sell_failure")
+                #    reply.body = jsonpickle.encode(data)
 
-                    await self.send(reply)
+                #    await self.send(reply)
