@@ -3,6 +3,7 @@ from spade.behaviour import PeriodicBehaviour
 from spade.message import Message
 from utils.trade import Trade
 from utils.log import Log
+from utils.env import XMPP_SERVER
 
 class CheckBehaviour(PeriodicBehaviour):
     async def on_start(self):
@@ -14,7 +15,7 @@ class CheckBehaviour(PeriodicBehaviour):
 
             if coin.profit >= self.agent.takeprofit:
                 # Vender 
-                msg = Message(to="broker@localhost")
+                msg = Message(to=f"broker@{XMPP_SERVER}")
                 msg.set_metadata("performative", "sell_request")
 
                 trade = Trade(coinid, quantity=coin.quantity)
@@ -25,7 +26,7 @@ class CheckBehaviour(PeriodicBehaviour):
 
             elif coin.profit <= self.agent.stoploss*(-1):
                 # Vender
-                msg = Message(to="broker@localhost")
+                msg = Message(to=f"broker@{XMPP_SERVER}")
                 msg.set_metadata("performative", "sell_request")
 
                 trade = Trade(coinid, quantity=coin.quantity)

@@ -25,7 +25,7 @@ class ManagerBehaviour(CyclicBehaviour):
             Log.log(str(self.agent.jid).partition('@')[0], f"{performative} received")
 
             if performative == "call_inform":
-                msg = Message(to="mapper@localhost")
+                msg = Message(to=f"mapper@{XMPP_SERVER}")
                 msg.set_metadata("performative", "request")
                 msg.body = jsonpickle.encode(data)
 
@@ -47,7 +47,7 @@ class ManagerBehaviour(CyclicBehaviour):
                 if coinid not in self.agent.portfolio:
                     self.agent.portfolio[coinid] = Asset(coinid, name)
 
-                    msg = Message(to="broker@localhost")
+                    msg = Message(to=f"broker@{XMPP_SERVER}")
                     msg.set_metadata("performative", "buy_request")
 
                     trade = Trade(coinid, balance=self.agent.trade_balance)

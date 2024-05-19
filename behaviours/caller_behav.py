@@ -6,6 +6,7 @@ from spade.behaviour import PeriodicBehaviour
 from spade.message import Message
 from utils.call import Call
 from utils.log import Log
+from utils.env import XMPP_SERVER
 
 class CallerBehaviour(PeriodicBehaviour):
     async def on_start(self):
@@ -36,7 +37,7 @@ class CallerBehaviour(PeriodicBehaviour):
                     match = re.search(r'\$(\w+)\b', data["text"])
 
                     if match is not None:
-                        msg = Message(to="manager@localhost")
+                        msg = Message(to=f"manager@{XMPP_SERVER}")
                         msg.set_metadata("performative", "call_inform")
                         
                         call = Call(match.group(1))

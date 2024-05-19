@@ -3,6 +3,7 @@ from spade.behaviour import PeriodicBehaviour
 from utils.crypto_info import get_market_data
 from utils.data import Data
 from utils.log import Log
+from utils.env import XMPP_SERVER
 from spade.message import Message
 
 class CollectBehaviour(PeriodicBehaviour):
@@ -10,7 +11,7 @@ class CollectBehaviour(PeriodicBehaviour):
         Log.log(str(self.agent.jid).partition('@')[0], "starting collector behaviour...")
 
     async def run(self):
-        msg = Message(to="manager@localhost")
+        msg = Message(to=f"manager@{XMPP_SERVER}")
         msg.set_metadata("performative", "collector_inform")
 
         data = get_market_data(self.agent.crypto)
