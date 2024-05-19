@@ -1,6 +1,6 @@
 import requests
+from utils.env import API_KEY
 
-API_KEY = '93dd4d1d-f5af-4c2f-9787-d7356d23dbc9'
 
 def get_cryptos_by_ticker(ticker):
     matching_coins = []

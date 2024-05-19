@@ -7,9 +7,8 @@ from utils.asset import Asset
 from utils.trade import Trade
 from utils.history import History
 from utils.log import Log
+from utils.env import XMPP_SERVER, PASSWORD
 
-XMPP_SERVER = 'localhost'
-PASSWORD = 'admin'
 
 class ManagerBehaviour(CyclicBehaviour):
     async def on_start(self):

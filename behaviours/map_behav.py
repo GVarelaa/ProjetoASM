@@ -33,6 +33,7 @@ class MapBehaviour(CyclicBehaviour):
                 else:
                     reply = Message(to=str(msg.sender))
                     reply.set_metadata("performative", "mapper_failure")
+                    reply.body = jsonpickle.encode(data)
 
                     await self.send(reply)
 

@@ -5,12 +5,10 @@ from agents.caller import CallerAgent
 from agents.manager import ManagerAgent
 from agents.broker import BrokerAgent
 from spade import quit_spade
+from utils.env import XMPP_SERVER, PASSWORD
 from ui.ui import MainPage
 import time
 
-
-XMPP_SERVER = 'localhost'
-PASSWORD = 'admin'
 
 if __name__ == "__main__":
     mapper = MapperAgent(f"mapper@{XMPP_SERVER}", PASSWORD)
